@@ -110,7 +110,7 @@ class AuthController extends Controller
         $provider = "facebook"; 
         $token = $request->input('access_token');
 
-        $providerUser = Socialite::driver($provider)->userFromToken($token);
+        $providerUser = Socialite::driver($provider)->user($token);
         
         $user = User::where('provider_name', $provider)->where('provider_id', $providerUser->id)->first();
 
