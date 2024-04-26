@@ -130,12 +130,14 @@ return [
        
  
         Ichtrojan\Otp\OtpServiceProvider::class,
+        Laravel\Socialite\SocialiteServiceProvider::class,
 
     ])->toArray(),
 
     'aliases' => Facade::defaultAliases()->merge([
     
         'Otp' => Ichtrojan\Otp\Otp::class,
+        'Socialite' => Laravel\Socialite\Facades\Socialite::class,
 
     ])->toArray(),
 

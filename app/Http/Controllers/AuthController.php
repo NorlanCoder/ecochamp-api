@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
@@ -92,6 +93,39 @@ class AuthController extends Controller
             'access_token' => $token,
             'token_type' => 'bearer',
             'user' => $user,
+        ]);
+    }
+
+    /**
+     * Social Login
+     */
+    public function socialRedirect(Request $request)
+    {
+        $provider = $request->input('provider');
+        return Socialite::driver($provider)->redirect();
+    }
+
+    public function socialLogin(Request $request)
+    {
+        $provider = "facebook"; 
+        $token = $request->input('access_token');
+
+        $providerUser = Socialite::driver($provider)->userFromToken($token);
+        
+        $user = User::where('provider_name', $provider)->where('provider_id', $providerUser->id)->first();
+
+        if($user == null){
+            $user = User::create([
+                'provider_name' => $provider,
+                'provider_id' => $providerUser->id,
+            ]);
+        }
+
+        $token = $user->createToken(env('APP_NAME'))->accessToken;
+
+        return response()->json([
+            'success' => true,
+            'token' => $token
         ]);
     }
 }
