@@ -21,7 +21,11 @@ return new class extends Migration
             $table->string('country');
             $table->string('city');
             $table->string('gender');
-            $table->foreignId('profile_image_id')->nullable();
+            $table->string('url_profil')->nullable();
+            $table->string('url_cover')->nullable();
+            $table->boolean('can_see_online')->default(true);
+            $table->string('can_see_profil');
+            $table->boolean('can_notify')->default(true);
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
