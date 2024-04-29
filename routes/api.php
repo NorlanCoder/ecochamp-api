@@ -31,6 +31,6 @@ Route::group([
     Route::post('me', [AuthController::class, 'me']);
 });
 
-Route::post('password/forgot',[ForgotPasswordController::class,'forgotPassword']);
-Route::post('password/reset',[ResetPasswordController::class,'resetPassword']);
+Route::post('password/forgot', [ForgotPasswordController::class, 'forgotPassword']);
+Route::post('password/reset', [ResetPasswordController::class, 'resetPassword']);
 Route::get('social/login', [AuthController::class, 'socialLogin']);
