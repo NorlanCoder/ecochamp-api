@@ -17,9 +17,11 @@ class AuthController extends Controller
      *
      * @return void
      */
-    public function __construct()
+    protected User $user;
+    public function __construct(User $user)
     {
         $this->middleware('auth:api', ['except' => ['login']]);
+        $this->user = $user;
     }
 
     /**
@@ -84,7 +86,33 @@ class AuthController extends Controller
             'success' => true,
             'token' => $token,
             'user' => $user
+        ], 200);
+    }
+
+    public function updatePassword(Request $request)
+    {
+
+        $validator = Validator::make([
+            'old_password' => ['required', 'string', 'max:255'],
+            'new_password' => ['required', 'string', 'max:255']
         ]);
+
+        $user = auth()->user;
+
+        if (Hash::check($user->password, $request->get('old_password'))) {
+            $this->user->where('id', $user->id)->update([
+                'password' => Hash::make($request->get('new_password'))
+            ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Mot de passe modifié avec succes'
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Mot de passe incorrect'
+            ]);
+        }
     }
 
     protected function respondWithToken($token, $user)
@@ -93,7 +121,7 @@ class AuthController extends Controller
             'access_token' => $token,
             'token_type' => 'bearer',
             'user' => $user,
-        ]);
+        ], 200);
     }
 
     /**
