@@ -38,6 +38,7 @@ class PostRequest extends FormRequest
             'end_date' => 'required_with:start_date|date|after:start_date',
             'medias.*' => 'file',
             'tags' => 'array',
+            'actions' => 'array',
         ];
     }
 
@@ -53,6 +54,7 @@ class PostRequest extends FormRequest
             'message.required' => 'Un message est nécessaire',
             'type_id.required' => 'Le type id est nécessaire',
             'tags.array' => 'Les tags doivent etre dans un tableau',
+            'action.array' => 'Les actions doivent etre dans un tableau',
             'medias.*.file' => 'Ca doit etre un traveau de fichier telecharger',
         ];
     }

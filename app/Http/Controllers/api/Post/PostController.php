@@ -7,12 +7,15 @@ use App\Http\Requests\PostReactionRequest;
 use App\Http\Requests\PostRequest;
 use App\Models\Media;
 use App\Models\Post;
+use App\Models\PostAction;
+use App\Models\PostActionUser;
 use App\Models\PostMedia;
 use App\Models\PostReaction;
 use App\Models\PostShare;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class PostController extends Controller
 {
@@ -102,6 +105,15 @@ class PostController extends Controller
 
             }
         }
+        if($request->actions){
+                    
+            foreach ($request->actions as $action) {
+                $post_action = PostAction::create([
+                    'post_id' => $post->id,
+                    'action_id' => $action->id,
+                ]);
+            }
+        }
         return response()->json([
             'status' => 'sucess',
             'message' => 'post create',
@@ -127,6 +139,41 @@ class PostController extends Controller
             'message' => 'post partage',
             'code' => '200',
             'data' => $post,
+            ]);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function addAction(Request $request)
+    {
+        $validator = Validator::make([
+            'user_id' => ['required'],
+            'post_id' => ['required'],
+            'action_id' => ['required']
+        ]);
+
+        $postAction = PostAction::where('post_id', $request->post_id)
+        ->with('post')->first();
+        if(!$postAction){
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'PostAction n\'exist pas',
+                'code' => '404',
+                'data' => null,
+                ]);
+        }
+
+        PostActionUser::createOrupdate([
+            'user_id' => $this->user->id,
+            'post_action_id' => $postAction->id,
+        ]);
+
+        return response()->json([
+            'status' => 'sucess',
+            'message' => 'action user ajouter avec succes',
+            'code' => '200',
+            'data' => $postAction,
             ]);
     }
 
@@ -220,6 +267,18 @@ class PostController extends Controller
             'start_date'        => isset($request->start_date)? $request->start_date : nullValue(),
             'end_date'      => isset($request->end_date)? $request->end_date : nullValue(),
         ]);
+
+        PostAction::where('post_id', $post->id)->delete();
+
+        if($request->actions){
+                    
+            foreach ($request->actions as $action) {
+                $post_action = PostAction::create([
+                    'post_id' => $post->id,
+                    'action_id' => $action->id,
+                ]);
+            }
+        }
 
         if ($request->tags){
             foreach ($request->tags as $label) {
