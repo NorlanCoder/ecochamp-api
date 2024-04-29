@@ -38,4 +38,24 @@ class Post extends Model
     {
         return $this->hasMany(Comment::class);
     }
+
+    public function postMedias(): HasMany
+    {
+        return $this->hasMany(PostMedia::class);
+    }
+
+    public function postShares(): HasMany
+    {
+        return $this->hasMany(PostShare::class);
+    }
+
+    public function tags(): HasMany
+    {
+        return $this->hasMany(Tag::class);
+    }
+
+    public function postReactions(): HasMany
+    {
+        return $this->hasMany(PostReaction::class);
+    }
 }
