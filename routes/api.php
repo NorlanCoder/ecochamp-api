@@ -3,7 +3,9 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Api\auth\ForgotPasswordController;
 use App\Http\Controllers\Api\auth\ResetPasswordController;
+use App\Http\Controllers\api\Post\PostCommentsController;
 use App\Http\Controllers\Api\Post\PostController;
+use App\Http\Controllers\api\ReactionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -45,6 +47,14 @@ Route::group([
     Route::post('post/share', [PostController::class, 'sharePost']);
     Route::post('post/reaction/add', [PostController::class, 'addReaction']);
     Route::delete('post/reaction/delete/{id}', [PostController::class, 'deleteReaction']);
+    Route::get('get/post/comment', [PostCommentsController::class, 'getPostComments']);
+    Route::post('create/post/comment', [PostCommentsController::class, 'createComment']);
+    Route::post('update/post/comment', [PostCommentsController::class, 'updateComment']);
+    Route::post('delete/post/comment', [PostCommentsController::class, 'deleteComment']);
+    Route::post('add/comment/reaction', [PostCommentsController::class, 'addCommentReaction']);
+    Route::post('update/comment/reaction', [PostCommentsController::class, 'updateCommentReaction']);
+    Route::post('delete/comment/reaction', [PostCommentsController::class, 'deleteCommentReaction']);
+    Route::get('get/reactions', [ReactionController::class, 'getReactions']);
 });
 Route::post('login', [AuthController::class, 'login'])->name('login');
 Route::get('post/user', [PostController::class, 'getUserPost']);
