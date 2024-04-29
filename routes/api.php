@@ -44,6 +44,7 @@ Route::group([
     Route::delete('post/delete/{id}', [PostController::class, 'deletePost']);
     Route::post('post/share', [PostController::class, 'sharePost']);
     Route::post('post/reaction/add', [PostController::class, 'addReaction']);
+    Route::post('post/action/add', [PostController::class, 'addAction']);
     Route::delete('post/reaction/delete/{id}', [PostController::class, 'deleteReaction']);
 });
 Route::post('login', [AuthController::class, 'login'])->name('login');
