@@ -60,7 +60,7 @@ class PostCommentsController extends Controller
                 'success' => true,
                 'data' => $comment,
                 'message' => 'comment created successfully',
-            ]);
+            ], 201);
         } catch (ValidationException $e) {
             return response()->json(['errors' => $e->errors()], 422);
         }
@@ -75,14 +75,14 @@ class PostCommentsController extends Controller
                 return response()->json(['message' => 'unauthorised']);
             }
 
-            $comment->content($request->content);
+            $comment->content = $request->content;
             $comment->save();
 
             return response()->json([
                 'success' => true,
                 'message' => 'Comment updated successfully',
                 'data' => $comment,
-            ]);
+            ], 201);
         } catch (ValidationException $e) {
             return response()->json(['errors' => $e->errors()], 422);
         }
@@ -104,7 +104,7 @@ class PostCommentsController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Comment deleted successfully'
-        ]);
+        ], 201);
     }
 
     public function addCommentReaction(AddCommentReactionRequest $request)
@@ -124,7 +124,7 @@ class PostCommentsController extends Controller
                 'success' => true,
                 'message' => 'Reaction added successfully',
                 'data' => $comment
-            ]);
+            ], 201);
         } catch (ValidationException $e) {
             return response()->json(['errors' => $e->errors()], 422);
         }
@@ -145,7 +145,7 @@ class PostCommentsController extends Controller
                 'success' => true,
                 'message' => 'Reaction updated successfully',
                 'data' => $comment
-            ]);
+            ], 201);
         } catch (ValidationException $e) {
             return response()->json(['errors' => $e->errors()], 422);
         }
@@ -171,6 +171,6 @@ class PostCommentsController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'reaction deleted successfully'
-        ]);
+        ], 201);
     }
 }

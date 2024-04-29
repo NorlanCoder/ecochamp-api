@@ -22,6 +22,6 @@ class ReactionController extends Controller
         return response()->json([
             'success' => true,
             'data' => $this->reaction
-        ]);
+        ], 200);
     }
 }
