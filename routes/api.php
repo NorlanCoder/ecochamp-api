@@ -40,14 +40,14 @@ Route::group([
 
 ], function ($router) {
 
-    Route::get('post/{id}', [PostController::class, 'getPost']);
+    Route::get('post', [PostController::class, 'getPost']);
     Route::post('post/create', [PostController::class, 'createPost']);
-    Route::put('post/update/{id}', [PostController::class, 'updatePost']);
-    Route::delete('post/delete/{id}', [PostController::class, 'deletePost']);
+    Route::put('post/update', [PostController::class, 'updatePost']);
+    Route::delete('post/delete', [PostController::class, 'deletePost']);
     Route::post('post/share', [PostController::class, 'sharePost']);
     Route::post('post/reaction/add', [PostController::class, 'addReaction']);
     Route::post('post/action/add', [PostController::class, 'addAction']);
-    Route::delete('post/reaction/delete/{id}', [PostController::class, 'deleteReaction']);
+    Route::delete('post/reaction/delete', [PostController::class, 'deleteReaction']);
     Route::get('get/post/comment', [PostCommentsController::class, 'getPostComments']);
     Route::post('create/post/comment', [PostCommentsController::class, 'createComment']);
     Route::post('update/post/comment', [PostCommentsController::class, 'updateComment']);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Post;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PostReactionRequest;
 use App\Http\Requests\PostRequest;
+use App\Http\Requests\PostUpdateRequest;
 use App\Models\Media;
 use App\Models\Post;
 use App\Models\PostAction;
@@ -39,8 +40,13 @@ class PostController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function getPost(string $id)
+    public function getPost(Request $request)
     {
+        $validator = $request->validate([
+            'id' => ['required'],
+        ]);
+        $id = $request->id;
+
         $post = Post::where('id', $id)
             ->with('user')->with('postMedias')
             ->with('postReactions')
@@ -126,8 +132,12 @@ class PostController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function sharePost(string $post_id)
+    public function sharePost(Request $request)
     {
+        $validator = $request->validate([
+            'post_id' => ['required'],
+        ]);
+        $post_id = $request->post_id;
         $post = Post::where('id', $post_id)->first();
         PostShare::create([
             'post_id' => $post->id,
@@ -147,7 +157,7 @@ class PostController extends Controller
      */
     public function addAction(Request $request)
     {
-        $validator = Validator::make([
+        $validator = $request->validate([
             'user_id' => ['required'],
             'post_id' => ['required'],
             'action_id' => ['required']
@@ -164,7 +174,7 @@ class PostController extends Controller
                 ]);
         }
 
-        PostActionUser::createOrupdate([
+        PostActionUser::createOrUpdate([
             'user_id' => $this->user->id,
             'post_action_id' => $postAction->id,
         ]);
@@ -209,9 +219,14 @@ class PostController extends Controller
     /**
      * Display the specified resource.
      */
-    public function deleteReaction(string $id)
+    public function deleteReaction(Request $request)
     {
-        $postReaction = PostReaction::where('post_id', $id)
+        $validator = $request->validate([
+            'post_id' => ['required'],
+        ]);
+        $post_id = $request->post_id;
+
+        $postReaction = PostReaction::where('post_id', $post_id)
             ->where('user_id', $this->user->id)->first();
         if(!$postReaction){
             return response()->json([
@@ -241,11 +256,11 @@ class PostController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function updatePost(Request $request, string $id)
+    public function updatePost(PostUpdateRequest $request)
     {
         $validated = $request->validated();
 
-        $post = Post::where('id', $id)
+        $post = Post::where('id', $request->id)
             ->where('user_id', $this->user->id)->first();
         if(!$post){
             return response()->json([
@@ -319,9 +334,14 @@ class PostController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function deletePost(string $id)
+    public function deletePost(Request $request)
     {
-        $post = Post::where('id', $id)
+        $validator = $request->validate([
+            'post_id' => ['required'],
+        ]);
+        $post_id = $request->post_id;
+
+        $post = Post::where('id', $post_id)
             ->where('user_id', $this->user->id)->first();
         if(!$post){
             return response()->json([
