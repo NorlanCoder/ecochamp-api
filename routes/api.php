@@ -57,7 +57,8 @@ Route::group([
     Route::post('delete/comment/reaction', [PostCommentsController::class, 'deleteCommentReaction']);
     Route::get('get/reactions', [ReactionController::class, 'getReactions']);
 });
-Route::post('login', [AuthController::class, 'login'])->name('login');
+Route::post('auth/login', [AuthController::class, 'login'])->name('login');
+Route::post('auth/register', [AuthController::class, 'register'])->name('register');
 Route::get('post/user', [PostController::class, 'getUserPost']);
 
 Route::post('password/forgot', [ForgotPasswordController::class, 'forgotPassword']);
