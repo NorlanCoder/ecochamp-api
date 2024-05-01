@@ -20,12 +20,12 @@ class AuthController extends Controller
     protected User $user;
     public function __construct(User $user)
     {
-        $this->middleware('auth:api', ['except' => ['login']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register']]);
         $this->user = $user;
     }
 
     /**
-     * Get a JWT via given credentials.
+     * Login
      *
      * @return \Illuminate\Http\JsonResponse
      */
@@ -48,9 +48,22 @@ class AuthController extends Controller
                 'message' => 'Identifiants incorrects'
             ], 401);
         }
+        $user = User::where('email', $request->email)->first();
 
-        return $this->respondWithToken($token, auth()->user);
+        // return $user->createToken("API TOKEN")->accessToken;
+        return response()->json([
+            'status' => true,
+            'message' => 'L\'utilisateur s\'est connecté avec succès',
+            'token' => $user->createToken("API TOKEN")->plainTextToken,
+            'user' => $user,
+        ], 200);
     }
+
+    /**
+     * Register
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
 
     public function register(Request $request)
     {
@@ -80,15 +93,21 @@ class AuthController extends Controller
             'email' => $request->email
         ]);
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        // $token = $user->createToken("API TOKEN")->accessToken;
 
         return response()->json([
-            'success' => true,
-            'token' => $token,
-            'user' => $user
+            'status' => true,
+            'message' => 'L\'utilisateur a été créé avec succès',
+            'token' => $user->createToken("API TOKEN")->plainTextToken,
+            'user' => $user,
         ], 200);
     }
 
+    /**
+     * updatePassword
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function updatePassword(Request $request)
     {
 
@@ -115,6 +134,12 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * respondWithToken
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+
     protected function respondWithToken($token, $user)
     {
         return response()->json([
@@ -126,6 +151,8 @@ class AuthController extends Controller
 
     /**
      * Social Login
+     *
+     * @return \Illuminate\Http\JsonResponse
      */
     public function socialRedirect(Request $request)
     {

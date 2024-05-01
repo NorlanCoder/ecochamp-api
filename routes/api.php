@@ -37,6 +37,7 @@ Route::group([
 Route::group([
 
     'middleware' => 'api',
+    'middleware' => 'auth:sanctum',
 
 ], function ($router) {
 
@@ -58,6 +59,7 @@ Route::group([
     Route::get('get/reactions', [ReactionController::class, 'getReactions']);
 });
 Route::post('login', [AuthController::class, 'login'])->name('login');
+Route::post('register', [AuthController::class, 'register'])->name('register');
 Route::get('post/user', [PostController::class, 'getUserPost']);
 
 Route::post('password/forgot', [ForgotPasswordController::class, 'forgotPassword']);

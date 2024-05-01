@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('username')->nullable();
             $table->string('lastname');
             $table->string('firstname');
             $table->string('phone_number')->unique();
@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('url_profil')->nullable();
             $table->string('url_cover')->nullable();
             $table->boolean('can_see_online')->default(true);
-            $table->string('can_see_profil');
+            $table->string('can_see_profil')->default('true');
             $table->boolean('can_notify')->default(true);
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
