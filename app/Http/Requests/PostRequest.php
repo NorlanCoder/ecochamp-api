@@ -3,7 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Enums\ActionStatus;
-use App\Enums\Enums\Distributed_to;
+use App\Enums\Distributed_to;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
@@ -31,14 +31,14 @@ class PostRequest extends FormRequest
             'message' => 'required|string',
             // 'country' => 'required',
             // 'city' => 'required',
-            // 'distributed_to' => [Rule::enum(Distributed_to::class)],
-            // 'type_id' => 'exists:App\Models\PostType,id',
+            'distributed_to' => [Rule::enum(Distributed_to::class)],
+            'type_id' => 'exists:App\Models\PostType,id',
             // 'status' => [Rule::enum(ActionStatus::class)],
-            // 'start_date' => 'date',
-            // 'end_date' => 'required_with:start_date|date|after:start_date',
-            // 'medias.*' => 'file',
-            // 'tags' => 'array',
-            // 'actions' => 'array',
+            'start_date' => 'date',
+            'end_date' => 'required_with:start_date|date|after:start_date',
+            'medias.*' => 'file',
+            'tags' => 'array',
+            'actions' => 'array',
         ];
     }
 
@@ -50,8 +50,8 @@ class PostRequest extends FormRequest
     public function messages(): array
     {
         return [
-        //     'title.required' => 'Un titre est nécessaire',
-        //     'message.required' => 'Un message est nécessaire',
+            'title.required' => 'Un titre est nécessaire',
+            'message.required' => 'Un message est nécessaire',
             'type_id.exists' => 'Le type id est nécessaire',
             'tags.array' => 'Les tags doivent etre dans un tableau',
             'action.array' => 'Les actions doivent etre dans un tableau',

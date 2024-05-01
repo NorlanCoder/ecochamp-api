@@ -40,16 +40,28 @@ class AuthController extends Controller
             return response()->json($validator->errors(), 400);
         }
 
-        $credentials = request(['email', 'password']);
+        // $credentials = request(['email', 'password']);
 
-        if (!$token = auth()->attempt($credentials)) {
+        // if (!$token = auth()->attempt($credentials)) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Identifiants incorrects'
+        //     ], 401);
+        // }
+        $user = User::where('email', $request->email)->first();
+        if(!$user){
             return response()->json([
-                'success' => false,
-                'message' => 'Identifiants incorrects'
+                'status' => false,
+                'message' => 'Email incorrects',
             ], 401);
         }
-        $user = User::where('email', $request->email)->first();
-
+        $password_verify = Hash::check($request->password, $user->password);
+        if(!$password_verify){
+            return response()->json([
+                'status' => false,
+                'message' => 'Password incorrects',
+            ], 401);
+        }
         // return $user->createToken("API TOKEN")->accessToken;
         return response()->json([
             'status' => true,

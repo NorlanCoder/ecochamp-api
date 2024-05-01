@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Post;
 
+use App\Enums\Distributed_to;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PostReactionRequest;
 use App\Http\Requests\PostRequest;
@@ -73,18 +74,18 @@ class PostController extends Controller
     public function createPost(PostRequest $request)
     {
         $validated = $request->validated();
-
+        $this->user = Auth::user();
         $post = Post::create([
             'user_id'       => $this->user->id,
             'title'     => $request->title,
             'message'       => $request->message,
-            'country'       => isset($request->country)? $request->country : nullValue(),
-            'city'      => isset($request->city)? $request->city : nullValue(),
-            'distributed_to'        => isset($request->distributed_to)? $request->distributed_to : nullValue(),
+            'country'       => isset($request->country)? $request->country : null,
+            'city'      => isset($request->city)? $request->city : null,
+            'distributed_to'        => isset($request->distributed_to)? $request->distributed_to : Distributed_to::PEOPLE,
             'type_id'       => $request->type_id,
-            'status'        => isset($request->status)? $request->status : nullValue(),
-            'start_date'        => isset($request->start_date)? $request->start_date : nullValue(),
-            'end_date'      => isset($request->end_date)? $request->end_date : nullValue(),
+            'status'        => isset($request->status)? $request->status : null,
+            'start_date'        => isset($request->start_date)? $request->start_date : null,
+            'end_date'      => isset($request->end_date)? $request->end_date : null,
         ]);
         if ($request->tags){
             foreach ($request->tags as $label) {
@@ -274,13 +275,13 @@ class PostController extends Controller
             'user_id'       => $this->user->id,
             'title'     => $request->title,
             'message'       => $request->message,
-            'country'       => isset($request->country)? $request->country : nullValue(),
-            'city'      => isset($request->city)? $request->city : nullValue(),
-            'distributed_to'        => isset($request->distributed_to)? $request->distributed_to : nullValue(),
+            'country'       => isset($request->country)? $request->country : null,
+            'city'      => isset($request->city)? $request->city : null,
+            'distributed_to'        => isset($request->distributed_to)? $request->distributed_to : null,
             'type_id'       => $request->type_id,
-            'status'        => isset($request->status)? $request->status : nullValue(),
-            'start_date'        => isset($request->start_date)? $request->start_date : nullValue(),
-            'end_date'      => isset($request->end_date)? $request->end_date : nullValue(),
+            'status'        => isset($request->status)? $request->status : null,
+            'start_date'        => isset($request->start_date)? $request->start_date : null,
+            'end_date'      => isset($request->end_date)? $request->end_date : null,
         ]);
 
         PostAction::where('post_id', $post->id)->delete();
