@@ -54,10 +54,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('update/comment/reaction', [PostCommentsController::class, 'updateCommentReaction']);
     Route::post('delete/comment/reaction', [PostCommentsController::class, 'deleteCommentReaction']);
     Route::get('get/reactions', [ReactionController::class, 'getReactions']);
+    Route::post('user/posts', [PostController::class, 'getUserPost']);
+
 });
 Route::post('login', [AuthController::class, 'login'])->name('login');
 Route::post('register', [AuthController::class, 'register'])->name('register');
-Route::post('post/user', [PostController::class, 'getUserPost']);
+Route::post('posts/users', [PostController::class, 'getPostUsers']);
 
 Route::post('postType/create', [PostTypeController::class, 'createPostType']);
 Route::post('postType/update', [PostTypeController::class, 'updatePostType']);

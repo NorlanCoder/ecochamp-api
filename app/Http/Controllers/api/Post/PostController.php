@@ -32,9 +32,29 @@ class PostController extends Controller
 
     
     /**
-     * Display a listing of the resource.
+     * getUserPost
      */
     public function getUserPost(Request $request)
+    {
+        $this->user = Auth::user();
+        if($this->user){
+           
+            $post = Post::where('user_id', $this->user->id)
+                ->orderByDesc('created_at')->paginate(20);
+        }
+        
+        return response()->json([
+            'status' => 'sucess',
+            'message' => 'post list user connect',
+            'code' => '200',
+            'data' => $post,
+        ]); 
+    }
+
+    /**
+     * getPostUsers
+     */
+    public function getPostUsers(Request $request)
     {
         $this->user = Auth::user();
         if($this->user){
@@ -66,15 +86,12 @@ class PostController extends Controller
         // return $this->getPost();
         return response()->json([
             'status' => 'sucess',
-            'message' => 'post delete',
+            'message' => 'post list user connect all plateforme',
             'code' => '200',
             'data' => $post,
         ]); 
     }
 
-    // private function getPost(){
-
-    // }
 
     /**
      * Display a listing of the resource.
