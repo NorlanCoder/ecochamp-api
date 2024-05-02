@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\PostReactionRequest;
 use App\Http\Requests\PostRequest;
 use App\Http\Requests\PostUpdateRequest;
+use App\Models\Follow;
 use App\Models\Media;
 use App\Models\Post;
 use App\Models\PostAction;
@@ -33,10 +34,39 @@ class PostController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function getUserPost()
+    public function getUserPost(Request $request)
     {
-        //
+        $this->user = Auth::user();
+        if($this->user){
+            $follows = Follow::where('follower_user_id', $this->user->id)->get();
+            $post = Post::orWhere('country', $this->user->country)
+            ->orWhere('city', $this->user->city)
+            ->Orwhere('user_id', $follows)
+            ->orderByDesc('created_at')->paginate(20);
+        }
+        else{
+            $validator = $request->validate([
+                'country' => ['required'],
+                'city' => ['required'],
+            ]);
+            $country = $request->country;
+            $city = $request->city;
+            $post = Post::orWhere('country', $country)
+            ->orWhere('city', $city)
+            ->orderByDesc('created_at')->paginate(20);
+        }
+        // return $this->getPost();
+        return response()->json([
+            'status' => 'sucess',
+            'message' => 'post delete',
+            'code' => '200',
+            'data' => $post,
+        ]); 
     }
+
+    // private function getPost(){
+
+    // }
 
     /**
      * Display a listing of the resource.
@@ -62,7 +92,7 @@ class PostController extends Controller
         }
         return response()->json([
             'status' => 'sucess',
-            'message' => 'post delete',
+            'message' => 'post get',
             'code' => '200',
             'data' => $post,
         ]); 

@@ -26,14 +26,11 @@ class PostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // 'user_id' => 'required',
             'title' => 'required|string',
             'message' => 'required|string',
-            // 'country' => 'required',
-            // 'city' => 'required',
             'distributed_to' => [Rule::enum(Distributed_to::class)],
             'type_id' => 'exists:App\Models\PostType,id',
-            // 'status' => [Rule::enum(ActionStatus::class)],
+            'status' => [Rule::enum(ActionStatus::class)],
             'start_date' => 'date',
             'end_date' => 'required_with:start_date|date|after:start_date',
             'medias.*' => 'file',

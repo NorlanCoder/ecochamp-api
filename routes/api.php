@@ -57,7 +57,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 });
 Route::post('login', [AuthController::class, 'login'])->name('login');
 Route::post('register', [AuthController::class, 'register'])->name('register');
-Route::get('post/user', [PostController::class, 'getUserPost']);
+Route::post('post/user', [PostController::class, 'getUserPost']);
 
 Route::post('postType/create', [PostTypeController::class, 'createPostType']);
 Route::post('postType/update', [PostTypeController::class, 'updatePostType']);
