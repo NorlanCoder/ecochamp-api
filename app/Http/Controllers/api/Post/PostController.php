@@ -39,10 +39,17 @@ class PostController extends Controller
         $this->user = Auth::user();
         if($this->user){
             $follows = Follow::where('follower_user_id', $this->user->id)->get();
-            $post = Post::orWhere('country', $this->user->country)
-            ->orWhere('city', $this->user->city)
-            ->Orwhere('user_id', $follows)
-            ->orderByDesc('created_at')->paginate(20);
+            $id_follows = [];
+            foreach ($follows as $follow){
+                array_push($id_follows, $follow->id);
+            }
+            $post = Post::where('country', $this->user->country)
+                ->orWhere('city', $this->user->city)
+                ->OrwhereIn(
+                    function($query) use($id_follows){
+                        $query->whereIn('user_id', $id_follows); 
+                    })
+                ->orderByDesc('created_at')->paginate(20);
         }
         else{
             $validator = $request->validate([
@@ -51,7 +58,8 @@ class PostController extends Controller
             ]);
             $country = $request->country;
             $city = $request->city;
-            $post = Post::orWhere('country', $country)
+            $post = Post::where('distributed_to', '!=', Distributed_to::FOLLOWERS)
+            ->orWhere('country', $country)
             ->orWhere('city', $city)
             ->orderByDesc('created_at')->paginate(20);
         }
