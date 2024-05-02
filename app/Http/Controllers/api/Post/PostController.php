@@ -30,21 +30,20 @@ class PostController extends Controller
         $this->user = Auth::user();
     }
 
-    
+
     /**
      * Display a listing of the resource.
      */
     public function getUserPost(Request $request)
     {
         $this->user = Auth::user();
-        if($this->user){
+        if ($this->user) {
             $follows = Follow::where('follower_user_id', $this->user->id)->get();
             $post = Post::orWhere('country', $this->user->country)
-            ->orWhere('city', $this->user->city)
-            ->Orwhere('user_id', $follows)
-            ->orderByDesc('created_at')->paginate(20);
-        }
-        else{
+                ->orWhere('city', $this->user->city)
+                ->Orwhere('user_id', $follows)
+                ->orderByDesc('created_at')->paginate(20);
+        } else {
             $validator = $request->validate([
                 'country' => ['required'],
                 'city' => ['required'],
@@ -52,8 +51,8 @@ class PostController extends Controller
             $country = $request->country;
             $city = $request->city;
             $post = Post::orWhere('country', $country)
-            ->orWhere('city', $city)
-            ->orderByDesc('created_at')->paginate(20);
+                ->orWhere('city', $city)
+                ->orderByDesc('created_at')->paginate(20);
         }
         // return $this->getPost();
         return response()->json([
@@ -61,7 +60,7 @@ class PostController extends Controller
             'message' => 'post delete',
             'code' => '200',
             'data' => $post,
-        ]); 
+        ]);
     }
 
     // private function getPost(){
@@ -82,20 +81,20 @@ class PostController extends Controller
             ->with('user')->with('postMedias')
             ->with('postReactions')
             ->with('tags')->first();
-        if(!$post){
+        if (!$post) {
             return response()->json([
                 'status' => 'failed',
                 'message' => 'post n\'exist pas',
                 'code' => '404',
                 'data' => null,
-            ]); 
+            ]);
         }
         return response()->json([
             'status' => 'sucess',
             'message' => 'post get',
             'code' => '200',
             'data' => $post,
-        ]); 
+        ]);
     }
 
     /**
@@ -109,26 +108,26 @@ class PostController extends Controller
             'user_id'       => $this->user->id,
             'title'     => $request->title,
             'message'       => $request->message,
-            'country'       => isset($request->country)? $request->country : null,
-            'city'      => isset($request->city)? $request->city : null,
-            'distributed_to'        => isset($request->distributed_to)? $request->distributed_to : Distributed_to::PEOPLE,
+            'country'       => isset($request->country) ? $request->country : null,
+            'city'      => isset($request->city) ? $request->city : null,
+            'distributed_to'        => isset($request->distributed_to) ? $request->distributed_to : Distributed_to::PEOPLE,
             'type_id'       => $request->type_id,
-            'status'        => isset($request->status)? $request->status : null,
-            'start_date'        => isset($request->start_date)? $request->start_date : null,
-            'end_date'      => isset($request->end_date)? $request->end_date : null,
+            'status'        => isset($request->status) ? $request->status : null,
+            'start_date'        => isset($request->start_date) ? $request->start_date : null,
+            'end_date'      => isset($request->end_date) ? $request->end_date : null,
         ]);
-        if ($request->tags){
+        if ($request->tags) {
             foreach ($request->tags as $label) {
                 $new_tag = Tag::where('label', $label);
-                if(!$new_tag){
+                if (!$new_tag) {
                     $new_tag = Tag::create(['label' => $label, 'count' => 0]);
                 }
                 $new_tag->count += 1;
                 $new_tag->save();
             }
         }
-        if($request->medias){
-                    
+        if ($request->medias) {
+
             foreach ($request->images as $image) {
                 $img = time() . $image->getClientOriginalName();
                 $path = $image->move(public_path() . "\post", $img);
@@ -139,11 +138,10 @@ class PostController extends Controller
                     'post_id' => $post->id,
                     'media_id' => $media->id,
                 ]);
-
             }
         }
-        if($request->actions){
-                    
+        if ($request->actions) {
+
             foreach ($request->actions as $action) {
                 $post_action = PostAction::create([
                     'post_id' => $post->id,
@@ -156,8 +154,7 @@ class PostController extends Controller
             'message' => 'post create',
             'code' => '200',
             'data' => $post,
-        ]); 
-        
+        ]);
     }
 
     /**
@@ -173,14 +170,14 @@ class PostController extends Controller
         PostShare::create([
             'post_id' => $post->id,
             'user_id' => $this->user->id,
-            ]);
+        ]);
 
         return response()->json([
             'status' => 'sucess',
             'message' => 'post partage',
             'code' => '200',
             'data' => $post,
-            ]);
+        ]);
     }
 
     /**
@@ -195,14 +192,14 @@ class PostController extends Controller
         ]);
 
         $postAction = PostAction::where('post_id', $request->post_id)
-        ->with('post')->first();
-        if(!$postAction){
+            ->with('post')->first();
+        if (!$postAction) {
             return response()->json([
                 'status' => 'failed',
                 'message' => 'PostAction n\'exist pas',
                 'code' => '404',
                 'data' => null,
-                ]);
+            ]);
         }
 
         PostActionUser::createOrUpdate([
@@ -215,7 +212,7 @@ class PostController extends Controller
             'message' => 'action user ajouter avec succes',
             'code' => '200',
             'data' => $postAction,
-            ]);
+        ]);
     }
 
     /**
@@ -224,13 +221,13 @@ class PostController extends Controller
     public function addReaction(PostReactionRequest $request)
     {
         $post = Post::where('id', $request->post_id)->first();
-        if(!$post){
+        if (!$post) {
             return response()->json([
                 'status' => 'failed',
                 'message' => 'post n\'exist pas',
                 'code' => '404',
                 'data' => null,
-                ]);
+            ]);
         }
 
         PostReaction::createOrupdate([
@@ -244,7 +241,7 @@ class PostController extends Controller
             'message' => 'reaction ajouter avec succes',
             'code' => '200',
             'data' => $post,
-            ]);
+        ]);
     }
 
     /**
@@ -259,13 +256,13 @@ class PostController extends Controller
 
         $postReaction = PostReaction::where('post_id', $post_id)
             ->where('user_id', $this->user->id)->first();
-        if(!$postReaction){
+        if (!$postReaction) {
             return response()->json([
                 'status' => 'failed',
                 'message' => 'postReaction n\'exist pas',
                 'code' => '404',
                 'data' => null,
-            ]); 
+            ]);
         }
         $postReaction->delete();
         return response()->json([
@@ -273,7 +270,7 @@ class PostController extends Controller
             'message' => 'postReaction delete',
             'code' => '200',
             'data' => null,
-        ]); 
+        ]);
     }
 
     /**
@@ -293,31 +290,31 @@ class PostController extends Controller
 
         $post = Post::where('id', $request->id)
             ->where('user_id', $this->user->id)->first();
-        if(!$post){
+        if (!$post) {
             return response()->json([
                 'status' => 'failed',
                 'message' => 'post n\'exist pas',
                 'code' => '404',
                 'data' => null,
-            ]); 
+            ]);
         }
         $post->upadte([
             'user_id'       => $this->user->id,
             'title'     => $request->title,
             'message'       => $request->message,
-            'country'       => isset($request->country)? $request->country : null,
-            'city'      => isset($request->city)? $request->city : null,
-            'distributed_to'        => isset($request->distributed_to)? $request->distributed_to : null,
+            'country'       => isset($request->country) ? $request->country : null,
+            'city'      => isset($request->city) ? $request->city : null,
+            'distributed_to'        => isset($request->distributed_to) ? $request->distributed_to : null,
             'type_id'       => $request->type_id,
-            'status'        => isset($request->status)? $request->status : null,
-            'start_date'        => isset($request->start_date)? $request->start_date : null,
-            'end_date'      => isset($request->end_date)? $request->end_date : null,
+            'status'        => isset($request->status) ? $request->status : null,
+            'start_date'        => isset($request->start_date) ? $request->start_date : null,
+            'end_date'      => isset($request->end_date) ? $request->end_date : null,
         ]);
 
         PostAction::where('post_id', $post->id)->delete();
 
-        if($request->actions){
-                    
+        if ($request->actions) {
+
             foreach ($request->actions as $action) {
                 $post_action = PostAction::create([
                     'post_id' => $post->id,
@@ -326,10 +323,10 @@ class PostController extends Controller
             }
         }
 
-        if ($request->tags){
+        if ($request->tags) {
             foreach ($request->tags as $label) {
                 $new_tag = Tag::where('label', $label);
-                if(!$new_tag){
+                if (!$new_tag) {
                     $new_tag = Tag::create(['label' => $label, 'count' => 0]);
                 }
                 $new_tag->count += 1;
@@ -339,8 +336,8 @@ class PostController extends Controller
 
         PostMedia::where('post_id', $post->id)->delete();
 
-        if($request->medias){
-                    
+        if ($request->medias) {
+
             foreach ($request->images as $image) {
                 $img = time() . $image->getClientOriginalName();
                 $path = $image->move(public_path() . "\post", $img);
@@ -351,7 +348,6 @@ class PostController extends Controller
                     'post_id' => $post->id,
                     'media_id' => $media->id,
                 ]);
-
             }
         }
         return response()->json([
@@ -359,7 +355,7 @@ class PostController extends Controller
             'message' => 'post mise à jour',
             'code' => '200',
             'data' => $post,
-        ]); 
+        ]);
     }
 
     /**
@@ -374,13 +370,13 @@ class PostController extends Controller
 
         $post = Post::where('id', $post_id)
             ->where('user_id', $this->user->id)->first();
-        if(!$post){
+        if (!$post) {
             return response()->json([
                 'status' => 'failed',
                 'message' => 'post n\'exist pas',
                 'code' => '404',
                 'data' => null,
-            ]); 
+            ]);
         }
         $post->delete();
         return response()->json([
@@ -388,6 +384,6 @@ class PostController extends Controller
             'message' => 'post delete',
             'code' => '200',
             'data' => null,
-        ]); 
+        ]);
     }
 }

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Follow extends Model
 {
     use HasFactory;
-    protected $fillable = 
+    protected $fillable =
     [
         'follower_user_id',
         'followed_user_id'
@@ -24,5 +24,4 @@ class Follow extends Model
     {
         return $this->belongsTo(User::class);
     }
-
 }

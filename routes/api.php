@@ -62,8 +62,6 @@ Route::post('post/user', [PostController::class, 'getUserPost']);
 Route::post('postType/create', [PostTypeController::class, 'createPostType']);
 Route::post('postType/update', [PostTypeController::class, 'updatePostType']);
 Route::post('postType/delete', [PostTypeController::class, 'deletePostType']);
-    
-
 Route::post('password/forgot', [ForgotPasswordController::class, 'forgotPassword']);
 Route::post('password/reset', [ResetPasswordController::class, 'resetPassword']);
 Route::get('social/login', [AuthController::class, 'socialLogin']);

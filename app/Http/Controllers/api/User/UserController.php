@@ -86,7 +86,6 @@ class UserController extends Controller
             'user_id' => $user->id,
             'media_id' => $media->id,
         ]);
-       
         $user->update([
             'url_profil' => $path,
             ]);
@@ -120,11 +119,19 @@ class UserController extends Controller
             'user_id' => $user->id,
             'media_id' => $media->id,
         ]);
+<<<<<<< HEAD
        
         $user->update([
             'url_cover' => $path,
             ]);
             
+=======
+
+        $user->update([
+            'url_cover' => $path,
+            ]);
+
+>>>>>>> 1f7b2cc9f9c29f9ae28aff87371401431bcf66af
         $user->save();
 
         return response()->json([

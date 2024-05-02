@@ -127,8 +127,8 @@ return [
     ],
 
     'providers' => ServiceProvider::defaultProviders()->merge([
-       
- 
+
+
         Ichtrojan\Otp\OtpServiceProvider::class,
         Laravel\Socialite\SocialiteServiceProvider::class,
         Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
@@ -136,7 +136,7 @@ return [
     ])->toArray(),
 
     'aliases' => Facade::defaultAliases()->merge([
-    
+
         'Otp' => Ichtrojan\Otp\Otp::class,
         'Socialite' => Laravel\Socialite\Facades\Socialite::class,
 

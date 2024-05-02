@@ -174,11 +174,11 @@ class AuthController extends Controller
 
     public function socialLogin(Request $request)
     {
-        $provider = "facebook"; 
+        $provider = "facebook";
         $token = $request->input('access_token');
 
         $providerUser = Socialite::driver($provider)->user($token);
-        
+
         $user = User::where('provider_name', $provider)->where('provider_id', $providerUser->id)->first();
 
         if($user == null){
