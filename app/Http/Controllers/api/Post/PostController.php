@@ -94,7 +94,7 @@ class PostController extends Controller
 
 
     /**
-     * Display a listing of the resource.
+     * getPost
      */
     public function getPost(Request $request)
     {
@@ -124,7 +124,7 @@ class PostController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * create post
      */
     public function createPost(PostRequest $request)
     {
@@ -186,7 +186,7 @@ class PostController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * partage post
      */
     public function sharePost(Request $request)
     {
@@ -209,7 +209,7 @@ class PostController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * create action(user add action)
      */
     public function addAction(Request $request)
     {
@@ -244,7 +244,7 @@ class PostController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * create reaction post
      */
     public function addReaction(PostReactionRequest $request)
     {
@@ -273,7 +273,7 @@ class PostController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * delete reaction post 
      */
     public function deleteReaction(Request $request)
     {
@@ -310,7 +310,7 @@ class PostController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update post
      */
     public function updatePost(PostUpdateRequest $request)
     {
@@ -388,7 +388,7 @@ class PostController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * remove post
      */
     public function deletePost(Request $request)
     {

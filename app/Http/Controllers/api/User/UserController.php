@@ -21,7 +21,7 @@ class UserController extends Controller
         $this->user = Auth::user();
     }
     /**
-     * Display a listing of the resource.
+     * get liste followers
      */
     public function getListFollowers()
     {
@@ -37,7 +37,7 @@ class UserController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * create follower.
      */
     public function createFollower(Request $request)
     {
@@ -68,7 +68,7 @@ class UserController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * change picture profile
      */
     public function pictureProfile(Request $request)
     {
@@ -102,7 +102,7 @@ class UserController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * change couverture profile
      */
     public function coverProfil(Request $request)
     {
@@ -136,7 +136,7 @@ class UserController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * create account profile
      */
     public function createAccount(Request $request)
     {

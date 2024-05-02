@@ -88,6 +88,9 @@ class PostCommentsController extends Controller
         }
     }
 
+    /**
+     * deleteComment
+     */
     public function deleteComment(Request $request)
     {
         $validator = Validator::make([
@@ -107,6 +110,9 @@ class PostCommentsController extends Controller
         ], 201);
     }
 
+    /**
+     * addCommentReaction
+     */
     public function addCommentReaction(AddCommentReactionRequest $request)
     {
         try {
@@ -129,7 +135,10 @@ class PostCommentsController extends Controller
             return response()->json(['errors' => $e->errors()], 422);
         }
     }
-
+    
+    /**
+     * updateCommentReaction
+     */
     public function updateCommentReaction(AddCommentReactionRequest $request)
     {
         try {
@@ -151,6 +160,9 @@ class PostCommentsController extends Controller
         }
     }
 
+    /**
+     * deleteCommentReaction
+     */
     public function deleteCommentReaction(Request $request)
     {
         $validator = Validator::make([

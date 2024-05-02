@@ -17,7 +17,7 @@ class PostTypeController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * create type post.
      */
     public function createPostType(Request $request)
     {
@@ -64,7 +64,7 @@ class PostTypeController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update type post.
      */
     public function updatePostType(Request $request)
     {
@@ -97,7 +97,7 @@ class PostTypeController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove type poste
      */
     public function deletePostType(Request $request)
     {
