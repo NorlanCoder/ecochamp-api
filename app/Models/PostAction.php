@@ -12,7 +12,8 @@ class PostAction extends Model
     protected $fillable =
     [
         'post_id',
-        'action_id'
+        'action_id',
+        'remove'
     ];
 
     public function post(): BelongsTo

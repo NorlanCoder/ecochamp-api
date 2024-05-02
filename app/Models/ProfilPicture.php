@@ -12,7 +12,8 @@ class ProfilPicture extends Model
     protected $fillable =
     [
         'user_id',
-        'media_id'
+        'media_id',
+        'remove'
     ];
 
     public function user(): BelongsTo

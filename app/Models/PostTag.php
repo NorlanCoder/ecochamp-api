@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PostTag extends Model
 {
@@ -12,8 +13,18 @@ class PostTag extends Model
     protected $fillable =
     [
         'post_id',
-        'tag_id'
+        'tag_id',
+        'remove'
     ];
 
-    
+    public function post(): BelongsTo
+    {
+        return $this->belongsTo(Post::class);
+    }
+
+    public function tag(): BelongsTo
+    {
+        return $this->belongsTo(Tag::class);
+    }
+
 }

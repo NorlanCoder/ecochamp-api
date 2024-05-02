@@ -22,8 +22,8 @@ class PostReactionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'post_id' => 'requied',
-            'reaction_id' => 'requied',
+            'post_id' => 'exists:App\Models\Post,id',
+            'reaction_id' => 'exists:App\Models\Reaction,id',
             // 'user_id' => 'requied',
         ];
     }
@@ -36,8 +36,8 @@ class PostReactionRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'post_id.required' => 'Le post id est nécessaire',
-            'reaction_id.required' => 'La reaction id est nécessaire',
+            'post_id.exists' => 'Le post id est invalide',
+            'reaction_id.exists' => 'La reaction id est invalide',
         ];
     }
 }

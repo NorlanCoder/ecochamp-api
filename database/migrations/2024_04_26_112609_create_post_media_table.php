@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('media_id')->constrained('media')->onDelete('cascade');
             $table->foreignId('post_id')->constrained('posts')->onDelete('cascade');
+            $table->boolean('remove')->default(false);
             $table->timestamps();
         });
     }

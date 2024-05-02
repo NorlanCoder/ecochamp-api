@@ -51,7 +51,7 @@ class Post extends Model
 
     public function tags(): HasMany
     {
-        return $this->hasMany(Tag::class);
+        return $this->hasMany(PostTag::class);
     }
 
     public function postReactions(): HasMany

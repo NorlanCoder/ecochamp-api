@@ -14,7 +14,8 @@ class PostReaction extends Model
     [
         'post_id',
         'user_id',
-        'reaction_id'
+        'reaction_id',
+        'remove'
     ];
     
     public function post(): BelongsTo

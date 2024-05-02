@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\api\Action\ActionController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Api\auth\ForgotPasswordController;
 use App\Http\Controllers\Api\auth\ResetPasswordController;
@@ -57,14 +58,27 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('user/posts', [PostController::class, 'getUserPost']);
 
 });
+
+Route::post('reaction/create', [ReactionController::class, 'createReaction']);
+
+
 Route::post('login', [AuthController::class, 'login'])->name('login');
 Route::post('register', [AuthController::class, 'register'])->name('register');
 Route::post('posts/users', [PostController::class, 'getPostUsers']);
 
+//// PostType
+Route::get('postType/list', [PostTypeController::class, 'postTypeList']);
 Route::post('postType/create', [PostTypeController::class, 'createPostType']);
 Route::post('postType/update', [PostTypeController::class, 'updatePostType']);
 Route::post('postType/delete', [PostTypeController::class, 'deletePostType']);
-    
+ 
+
+//// Action post
+Route::get('action/list', [ActionController::class, 'listAction']);
+Route::post('action/create', [ActionController::class, 'createPostAction']);
+Route::post('action/update', [ActionController::class, 'updateAction']);
+Route::post('action/delete', [ActionController::class, 'deleteAction']);
+ 
 
 Route::post('password/forgot', [ForgotPasswordController::class, 'forgotPassword']);
 Route::post('password/reset', [ResetPasswordController::class, 'resetPassword']);

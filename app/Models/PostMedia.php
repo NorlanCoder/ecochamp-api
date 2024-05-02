@@ -13,7 +13,8 @@ class PostMedia extends Model
     protected $fillable = 
     [
         'post_id',
-        'media_id'
+        'media_id',
+        'remove'
     ];
 
     public function post(): BelongsTo

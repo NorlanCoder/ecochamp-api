@@ -1,57 +1,49 @@
 <?php
 
-namespace App\Http\Controllers\Api\Post;
+namespace App\Http\Controllers\api\Action;
 
 use App\Http\Controllers\Controller;
-use App\Models\PostType;
+use App\Models\Action;
 use Illuminate\Http\Request;
 
-class PostTypeController extends Controller
+class ActionController extends Controller
 {
     /**
-     * post type list.
+     * list action post.
      */
-    public function postTypeList()
+    public function listAction()
     {
-        $postTypes = PostType::all();
+        $actions = Action::all();
 
         return response()->json([
             'status' => 'sucess',
-            'message' => 'postType listes',
+            'message' => 'action listes',
             'code' => '200',
-            'data' => $postTypes,
+            'data' => $actions,
         ]);
     }
 
     /**
-     * create type post.
+     * create action post.
      */
-    public function createPostType(Request $request)
+    public function createPostAction(Request $request)
     {
         $validator = $request->validate([
             'label'  => ['required'],
             'value'  => ['required']
         ]);
 
-        $postType = PostType::create([
+        $action = Action::create([
             'label'  => $request->label,
             'value'  => $request->value
         ]);
 
         return response()->json([
             'status' => 'sucess',
-            'message' => 'postType create',
+            'message' => 'action create',
             'code' => '200',
-            'data' => $postType,
+            'data' => $action,
         ]);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
     }
 
     /**
@@ -71,18 +63,18 @@ class PostTypeController extends Controller
     }
 
     /**
-     * Update type post.
+     * Update action post.
      */
-    public function updatePostType(Request $request)
+    public function updateAction(Request $request)
     {
         $validator = $request->validate([
-            'id'  => ['exists:App\Models\PostType,id'],
+            'id'  => ['exists:App\Models\Action,id'],
             'label'  => ['required'],
             'value'  => ['required']
         ]);
 
-        $postType = PostType::where('id', $request->id)->first();
-        if(!$postType){
+        $action = Action::where('id', $request->id)->first();
+        if(!$action){
             return response()->json([
                 'status' => 'failed',
                 'message' => 'post type n\'exist pas',
@@ -90,30 +82,30 @@ class PostTypeController extends Controller
                 'data' => null,
             ]); 
         }
-        $postType->update([
+        $action->update([
             'label'  => $request->label,
             'value'  => $request->value
         ]);
 
         return response()->json([
             'status' => 'sucess',
-            'message' => 'postType update',
+            'message' => 'action update',
             'code' => '200',
-            'data' => $postType,
+            'data' => $action,
         ]);
     }
 
     /**
-     * Remove type poste
+     * Remove action poste
      */
-    public function deletePostType(Request $request)
+    public function deleteAction(Request $request)
     {
         $validator = $request->validate([
-            'id'  => ['exists:App\Models\PostType,id'],
+            'id'  => ['required'],
         ]);
 
-        $postType = PostType::where('id', $request->id)->first();
-        if(!$postType){
+        $action = Action::where('id', $request->id)->first();
+        if(!$action){
             return response()->json([
                 'status' => 'failed',
                 'message' => 'post type n\'exist pas',
@@ -121,13 +113,13 @@ class PostTypeController extends Controller
                 'data' => null,
             ]); 
         }
-        $postType->delete();
+        $action->delete();
 
         return response()->json([
             'status' => 'sucess',
-            'message' => 'postType delete',
+            'message' => 'action delete',
             'code' => '200',
-            'data' => $postType,
+            'data' => $action,
         ]);
     }
 }

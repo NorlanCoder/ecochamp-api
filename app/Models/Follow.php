@@ -12,7 +12,8 @@ class Follow extends Model
     protected $fillable = 
     [
         'follower_user_id',
-        'followed_user_id'
+        'followed_user_id',
+        'remove'
     ];
 
     public function follower_user(): BelongsTo

@@ -19,9 +19,29 @@ class ReactionController extends Controller
      */
     public function getReactions()
     {
+        $reactions = Reaction::all();
         return response()->json([
             'success' => true,
-            'data' => $this->reaction
+            'data' => $reactions
+        ], 200);
+    }
+
+    /**
+     * create of the reaction.
+     */
+    public function createReaction(Request $request)
+    {
+        $validator = $request->validate([
+            'name'  => ['required'],
+            'icone'  => ['required']
+        ]);
+        $reaction = Reaction::create([
+            'name'  => $request->name,
+            'icone'  => $request->icone
+        ]);
+        return response()->json([
+            'success' => true,
+            'data' => $reaction
         ], 200);
     }
 }

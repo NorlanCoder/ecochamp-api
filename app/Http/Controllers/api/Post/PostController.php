@@ -10,6 +10,7 @@ use App\Http\Requests\PostUpdateRequest;
 use App\Models\Follow;
 use App\Models\Media;
 use App\Models\Post;
+use App\Models\User;
 use App\Models\PostAction;
 use App\Models\PostActionUser;
 use App\Models\PostMedia;
@@ -36,11 +37,18 @@ class PostController extends Controller
      */
     public function getUserPost(Request $request)
     {
-        $this->user = Auth::user();
+        if($request->user_id){
+            $this->user = User::where('id', $request->user_id)->first();
+        }else{
+            $this->user = Auth::user();
+        }
         if($this->user){
            
             $post = Post::where('user_id', $this->user->id)
-                ->orderByDesc('created_at')->paginate(20);
+                ->orderByDesc('created_at')
+                ->with('postMedias')
+            ->with('postReactions')
+            ->with('tags')->orderByDesc('created_at')->paginate(20);
         }
         
         return response()->json([
@@ -69,6 +77,9 @@ class PostController extends Controller
                     function($query) use($id_follows){
                         $query->whereIn('user_id', $id_follows); 
                     })
+                ->with('postMedias')
+                ->with('postReactions')
+                ->with('tags')
                 ->orderByDesc('created_at')->paginate(20);
         }
         else{
@@ -81,6 +92,9 @@ class PostController extends Controller
             $post = Post::where('distributed_to', '!=', Distributed_to::FOLLOWERS)
             ->orWhere('country', $country)
             ->orWhere('city', $city)
+            ->with('postMedias')
+            ->with('postReactions')
+            ->with('tags')
             ->orderByDesc('created_at')->paginate(20);
         }
         // return $this->getPost();
@@ -99,7 +113,7 @@ class PostController extends Controller
     public function getPost(Request $request)
     {
         $validator = $request->validate([
-            'id' => ['required'],
+            'id' => ['exists:App\Models\Post,id'],
         ]);
         $id = $request->id;
 
@@ -191,7 +205,7 @@ class PostController extends Controller
     public function sharePost(Request $request)
     {
         $validator = $request->validate([
-            'post_id' => ['required'],
+            'post_id' => ['exists:App\Models\Post,id'],
         ]);
         $post_id = $request->post_id;
         $post = Post::where('id', $post_id)->first();
@@ -214,9 +228,9 @@ class PostController extends Controller
     public function addAction(Request $request)
     {
         $validator = $request->validate([
-            'user_id' => ['required'],
-            'post_id' => ['required'],
-            'action_id' => ['required']
+            'user_id' => ['exists:App\Models\User,id'],
+            'post_id' => ['exists:App\Models\Post,id'],
+            'action_id' => ['exists:App\Models\Action,id']
         ]);
 
         $postAction = PostAction::where('post_id', $request->post_id)
@@ -248,6 +262,7 @@ class PostController extends Controller
      */
     public function addReaction(PostReactionRequest $request)
     {
+        $this->user = Auth::user();
         $post = Post::where('id', $request->post_id)->first();
         if(!$post){
             return response()->json([
@@ -257,8 +272,48 @@ class PostController extends Controller
                 'data' => null,
                 ]);
         }
+        $postReaction = PostReaction::where('user_id',  $this->user->id)
+            ->where('post_id', $post->id)->first();
 
-        PostReaction::createOrupdate([
+        if($postReaction){
+            if($request->reaction_id === $postReaction->reaction_id){
+                $postReaction->update([
+                    'remove' => true,
+                ]);
+                return response()->json([
+                    'status' => 'sucess',
+                    'message' => 'reaction supprimer avec succes',
+                    'code' => '200',
+                    'data' => $post,
+                    ]);
+            }
+            else if($request->reaction_id != $postReaction->reaction_id) {
+
+                $postReaction->update([
+                    'user_id' => $this->user->id,
+                    'post_id' => $post->id,
+                    'reaction_id' => $request->reaction_id,
+                ]);
+                return response()->json([
+                    'status' => 'sucess',
+                    'message' => 'reaction modifie avec succes',
+                    'code' => '200',
+                    'data' => $post,
+                    ]);
+            }
+            else{
+                $postReaction->update([
+                    'remove' => false,
+                ]);
+                return response()->json([
+                    'status' => 'sucess',
+                    'message' => 'reaction ajouter avec succes',
+                    'code' => '200',
+                    'data' => $post,
+                    ]);
+            }
+        }
+        PostReaction::Create([
             'user_id' => $this->user->id,
             'post_id' => $post->id,
             'reaction_id' => $request->reaction_id,
@@ -278,7 +333,7 @@ class PostController extends Controller
     public function deleteReaction(Request $request)
     {
         $validator = $request->validate([
-            'post_id' => ['required'],
+            'post_id' => ['exists:App\Models\Post,id'],
         ]);
         $post_id = $request->post_id;
 
@@ -393,7 +448,7 @@ class PostController extends Controller
     public function deletePost(Request $request)
     {
         $validator = $request->validate([
-            'post_id' => ['required'],
+            'post_id' => ['exists:App\Models\Post,id'],
         ]);
         $post_id = $request->post_id;
 
