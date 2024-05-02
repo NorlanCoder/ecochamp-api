@@ -3,7 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Enums\ActionStatus;
-use App\Enums\Enums\Distributed_to;
+use App\Enums\Distributed_to;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
@@ -26,14 +26,11 @@ class PostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // 'user_id' => 'requied',
-            'title' => 'requied',
-            'message' => 'requied',
-            // 'country' => 'requied',
-            // 'city' => 'requied',
+            'title' => 'required|string',
+            'message' => 'required|string',
             'distributed_to' => [Rule::enum(Distributed_to::class)],
             'type_id' => 'exists:App\Models\PostType,id',
-            // 'status' => [Rule::enum(ActionStatus::class)],
+            'status' => [Rule::enum(ActionStatus::class)],
             'start_date' => 'date',
             'end_date' => 'required_with:start_date|date|after:start_date',
             'medias.*' => 'file',
@@ -52,7 +49,7 @@ class PostRequest extends FormRequest
         return [
             'title.required' => 'Un titre est nécessaire',
             'message.required' => 'Un message est nécessaire',
-            'type_id.required' => 'Le type id est nécessaire',
+            'type_id.exists' => 'Le type id est nécessaire',
             'tags.array' => 'Les tags doivent etre dans un tableau',
             'action.array' => 'Les actions doivent etre dans un tableau',
             'medias.*.file' => 'Ca doit etre un traveau de fichier telecharger',

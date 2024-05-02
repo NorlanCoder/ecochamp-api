@@ -8,10 +8,11 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
@@ -39,7 +40,13 @@ class User extends Authenticatable implements JWTSubject
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'firstname',
+        'lastname',
+        'phone_number',
+        'country' ,
+        'city',
+        'gender',
+        'password',
         'email',
         'password',
     ];
@@ -80,6 +87,21 @@ class User extends Authenticatable implements JWTSubject
     public function postReactions(): HasMany
     {
         return $this->hasMany(PostReaction::class);
+    }
+
+    public function follows(): HasMany
+    {
+        return $this->hasMany(Follow::class);
+    }
+
+    public function coverPictures(): HasMany
+    {
+        return $this->hasMany(CoverPicture::class);
+    }
+
+    public function profilPictures(): HasMany
+    {
+        return $this->hasMany(ProfilPicture::class);
     }
 
 }

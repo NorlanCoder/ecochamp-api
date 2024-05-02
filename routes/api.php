@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\auth\ForgotPasswordController;
 use App\Http\Controllers\Api\auth\ResetPasswordController;
 use App\Http\Controllers\api\Post\PostCommentsController;
 use App\Http\Controllers\Api\Post\PostController;
+use App\Http\Controllers\Api\Post\PostTypeController;
 use App\Http\Controllers\api\ReactionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +25,7 @@ use Illuminate\Support\Facades\Route;
 Route::group([
 
     'middleware' => 'api',
+    'middleware' => 'auth:sanctum',
     'prefix' => 'auth'
 
 ], function ($router) {
@@ -34,11 +36,7 @@ Route::group([
 });
 
 
-Route::group([
-
-    'middleware' => 'api',
-
-], function ($router) {
+Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('post', [PostController::class, 'getPost']);
     Route::post('post/create', [PostController::class, 'createPost']);
@@ -57,9 +55,14 @@ Route::group([
     Route::post('delete/comment/reaction', [PostCommentsController::class, 'deleteCommentReaction']);
     Route::get('get/reactions', [ReactionController::class, 'getReactions']);
 });
-Route::post('auth/login', [AuthController::class, 'login'])->name('login');
-Route::post('auth/register', [AuthController::class, 'register'])->name('register');
-Route::get('post/user', [PostController::class, 'getUserPost']);
+Route::post('login', [AuthController::class, 'login'])->name('login');
+Route::post('register', [AuthController::class, 'register'])->name('register');
+Route::post('post/user', [PostController::class, 'getUserPost']);
+
+Route::post('postType/create', [PostTypeController::class, 'createPostType']);
+Route::post('postType/update', [PostTypeController::class, 'updatePostType']);
+Route::post('postType/delete', [PostTypeController::class, 'deletePostType']);
+
 
 Route::post('password/forgot', [ForgotPasswordController::class, 'forgotPassword']);
 Route::post('password/reset', [ResetPasswordController::class, 'resetPassword']);
