@@ -26,8 +26,8 @@ class UserController extends Controller
     public function getListFollowers()
     {
         $followers = Follow::where('followed_user_id', $this->user->id)
-                    ->with('follower_user')
-                    ->paginate(20);
+            ->with('follower_user')
+            ->paginate(20);
         return response()->json([
             'status' => 'sucess',
             'message' => 'user followers',
@@ -46,18 +46,18 @@ class UserController extends Controller
         ]);
         $followed_user_id = $request->followed_user_id;
         $followed = User::where('id', $followed_user_id)->first();
-        if(!$followed){
+        if (!$followed) {
             return response()->json([
                 'status' => 'failed',
                 'message' => 'followed n\'exist pas',
                 'code' => '404',
                 'data' => null,
-                ]);
+            ]);
         }
         $follow = Follow::create([
             'followed_user_id' => $followed->id,
             'follower_user_id' => $this->user->id,
-            ]);
+        ]);
 
         return response()->json([
             'status' => 'sucess',
@@ -88,7 +88,7 @@ class UserController extends Controller
         ]);
         $user->update([
             'url_profil' => $path,
-            ]);
+        ]);
 
         $user->save();
 
@@ -119,19 +119,11 @@ class UserController extends Controller
             'user_id' => $user->id,
             'media_id' => $media->id,
         ]);
-<<<<<<< HEAD
-       
-        $user->update([
-            'url_cover' => $path,
-            ]);
-            
-=======
 
         $user->update([
             'url_cover' => $path,
-            ]);
+        ]);
 
->>>>>>> 1f7b2cc9f9c29f9ae28aff87371401431bcf66af
         $user->save();
 
         return response()->json([
