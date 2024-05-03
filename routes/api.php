@@ -50,10 +50,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('create/post/comment', [PostCommentsController::class, 'createComment']);
     Route::post('update/post/comment', [PostCommentsController::class, 'updateComment']);
     Route::post('delete/post/comment', [PostCommentsController::class, 'deleteComment']);
-    Route::post('add/comment/reaction', [PostCommentsController::class, 'addCommentReaction']);
-    Route::post('update/comment/reaction', [PostCommentsController::class, 'updateCommentReaction']);
+    Route::post('add/post/comment/reaction', [PostCommentsController::class, 'addCommentReaction']);
+    Route::post('update/post/comment/reaction', [PostCommentsController::class, 'updateCommentReaction']);
     Route::post('delete/comment/reaction', [PostCommentsController::class, 'deleteCommentReaction']);
     Route::get('get/reactions', [ReactionController::class, 'getReactions']);
+    Route::post('add/reaction', [ReactionController::class, 'addReaction']);
 });
 Route::post('login', [AuthController::class, 'login'])->name('login');
 Route::post('register', [AuthController::class, 'register'])->name('register');

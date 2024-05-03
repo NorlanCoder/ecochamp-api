@@ -288,8 +288,8 @@ class PostController extends Controller
     {
         $validated = $request->validated();
 
-        $post = Post::where('id', $request->id)
-            ->where('user_id', $this->user->id)->first();
+        $post = Post::where('id', $request->post_id)
+            ->where('user_id', auth()->user()->id)->first();
         if (!$post) {
             return response()->json([
                 'status' => 'failed',
@@ -298,8 +298,8 @@ class PostController extends Controller
                 'data' => null,
             ]);
         }
-        $post->upadte([
-            'user_id'       => $this->user->id,
+        $post->update([
+            'user_id'       => auth()->user()->id,
             'title'     => $request->title,
             'message'       => $request->message,
             'country'       => isset($request->country) ? $request->country : null,
@@ -369,7 +369,7 @@ class PostController extends Controller
         $post_id = $request->post_id;
 
         $post = Post::where('id', $post_id)
-            ->where('user_id', $this->user->id)->first();
+            ->where('user_id', auth()->user()->id)->first();
         if (!$post) {
             return response()->json([
                 'status' => 'failed',

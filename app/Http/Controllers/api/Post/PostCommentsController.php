@@ -32,7 +32,7 @@ class PostCommentsController extends Controller
      */
     public function getPostComments(Request $request)
     {
-        $validator = Validator::make([
+        $validator = Validator::make($request->all(), [
             'post_id' => ['required', 'integer', 'exists:posts,id']
         ]);
 
@@ -54,7 +54,9 @@ class PostCommentsController extends Controller
     public function createComment(CreateCommentRequest $request)
     {
         try {
-            $comment = $this->post->where('id', $request->get('post_id'))->comments->create(['content' => $request->content, 'user_id' => auth()->user()->id]);
+            $post = $this->post->where('id', $request->get('post_id'))->first();
+
+            $comment = $post->comments()->create(['content' => $request->content, 'user_id' => auth()->user()->id]);
 
             return response()->json([
                 'success' => true,
@@ -90,7 +92,7 @@ class PostCommentsController extends Controller
 
     public function deleteComment(Request $request)
     {
-        $validator = Validator::make([
+        $validator = Validator::make($request->all(), [
             'comment_id' => ['required', 'integer', 'exists:comments,id']
         ]);
 
@@ -112,7 +114,7 @@ class PostCommentsController extends Controller
         try {
             $comment = $this->comment->find($request->get('comment_id'));
 
-            $comment->reactions->create(
+            $comment->reactions()->create(
                 [
                     'reaction_id' => $request->get('reaction_id'),
                     'user_id' => auth()->user()->id,
@@ -123,7 +125,7 @@ class PostCommentsController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Reaction added successfully',
-                'data' => $comment
+                'data' => $comment->load('reactions')
             ], 201);
         } catch (ValidationException $e) {
             return response()->json(['errors' => $e->errors()], 422);
@@ -139,7 +141,7 @@ class PostCommentsController extends Controller
                     'message' => 'unauthorised'
                 ]);
             }
-            $comment->reactions->update(['reaction_id' => $request->get('reaction_id')]);
+            $comment->reactions()->update(['reaction_id' => $request->get('reaction_id')]);
 
             return response()->json([
                 'success' => true,
@@ -153,8 +155,8 @@ class PostCommentsController extends Controller
 
     public function deleteCommentReaction(Request $request)
     {
-        $validator = Validator::make([
-            'comment_id' => ['required', 'integer', 'exists:comments,id']
+        $validator = Validator::make($request->all(), [
+            'comment_id' => ['required', 'integer', 'exists:comments,id'],
         ]);
         if ($validator->fails()) {
             return response()->json($validator->errors(), 400);

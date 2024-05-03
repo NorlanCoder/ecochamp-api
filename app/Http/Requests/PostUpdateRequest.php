@@ -24,10 +24,10 @@ class PostUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id' => 'requied',
-            'title' => 'requied',
-            'message' => 'requied',
-            'distributed_to' => [Rule::enum(Distributed_to::class)],
+            'post_id' => 'required',
+            'title' => 'required',
+            'message' => 'required',
+            'distributed_to' => 'required',
             'type_id' => 'exists:App\Models\PostType,id',
             'start_date' => 'date',
             'end_date' => 'required_with:start_date|date|after:start_date',
