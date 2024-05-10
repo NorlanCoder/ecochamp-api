@@ -9,9 +9,12 @@
         "dedoc/scramble": "^0.9.0",
         "ichtrojan/laravel-otp": "^2.0",
         "laravel/framework": "^11.0",
+        "laravel/reverb": "@beta",
         "laravel/sanctum": "^4.0",
         "laravel/socialite": "^5.13",
         "laravel/tinker": "^2.9",
+        "predis/predis": "^2.2",
+        "pusher/pusher-php-server": "^7.2",
         "tymon/jwt-auth": "^2.1"
     },
     "require-dev": {

@@ -28,5 +28,9 @@ class AppServiceProvider extends ServiceProvider
                 SecurityScheme::http('bearer', 'JWT')
             );
         });
+
+        // if($this->app->environment() == 'local'){
+        //     DB::listen()
+        // }
     }
 }
