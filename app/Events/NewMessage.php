@@ -20,6 +20,7 @@ class NewMessage implements ShouldBroadcast
      * @var Message
      */
     private $message;
+
     /**
      * Create a new event instance.
      */
@@ -39,4 +40,21 @@ class NewMessage implements ShouldBroadcast
             new PrivateChannel('App.User'. $this->message->to_id),
         ];
     }
+
+    /**
+     * Get the channels the event should broadcast with.
+     *
+     * @return array<int, \Illuminate\Broadcasting\Channel>
+     */
+    public function broadcastWith(): array
+    {
+        return [
+            'message' => $this->message->load([
+                'from' => function($query){
+                    $query->select('id', 'fistname');
+                }
+                ])->toArray(),
+        ];
+    }
+
 }

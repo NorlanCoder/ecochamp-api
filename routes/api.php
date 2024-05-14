@@ -4,9 +4,12 @@ use App\Http\Controllers\api\Action\ActionController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Api\auth\ForgotPasswordController;
 use App\Http\Controllers\Api\auth\ResetPasswordController;
+use App\Http\Controllers\api\Chat\ConversationController;
 use App\Http\Controllers\api\Post\PostCommentsController;
 use App\Http\Controllers\Api\Post\PostController;
 use App\Http\Controllers\Api\Post\PostTypeController;
+// use App\Http\Controllers\Api\Chat\ConversationController;
+use App\Http\Controllers\Api\Chat\MessageController;
 use App\Http\Controllers\api\ReactionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -56,6 +59,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('delete/comment/reaction', [PostCommentsController::class, 'deleteCommentReaction']);
     Route::get('get/reactions', [ReactionController::class, 'getReactions']);
     Route::post('user/posts', [PostController::class, 'getUserPost']);
+    
+    //Conversation controller
+    Route::get('conversation/list', [ConversationController::class, 'listConversations']);
+    Route::get('conversation/message/list/for', [ConversationController::class, 'getMessageFor']);
+    Route::post('conversation/message/send', [ConversationController::class, 'sendMessage']);
 
 });
 
@@ -83,3 +91,7 @@ Route::post('action/delete', [ActionController::class, 'deleteAction']);
 Route::post('password/forgot', [ForgotPasswordController::class, 'forgotPassword']);
 Route::post('password/reset', [ResetPasswordController::class, 'resetPassword']);
 Route::get('social/login', [AuthController::class, 'socialLogin']);
+
+
+
+

@@ -1,43 +1,40 @@
 <?php
 
-namespace App\Http\Controllers\Api\Chat;
+namespace App\Http\Controllers\api\Chat;
 
 use App\Events\NewMessage;
-use App\Models\Conversation;
-use App\Models\User;
-use App\Repository\ConversationsRepository;
-use Illuminate\Auth\AuthManager;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Chat\StoreMessageRequest;
+use App\Repository\ConversationsRepository;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ConversationController extends Controller
 {
-/**
- * @var AuthManager
- */
-private $auth;
+    protected $user;
 
-/**
- * @var ConversationsRepository
- */
-private $coversRepo;
+    protected $coversRepo;
 
-public function __construct(ConversationsRepository $conversationsRepository, AuthManager $auth)
-{
-    $this->coversRepo = $conversationsRepository;
-    $this->auth = $auth;
-}
+    public function __construct(ConversationsRepository $conversationsRepository)
+    {
+        $this->coversRepo = $conversationsRepository;
+        $this->user = Auth::user();
+    }
+
+
     /**
      * list user conversation.
      */
     public function listConversations()
     {
+        $this->user = Auth::user();
+        // dd($this->user);
         return response()->json([
             'status' => 'success',
             'message' => 'list conversations',
             'code' => '200',
-            'data' => $this->coversRepo->getconversation($this->auth->user()->id),
+            // 'dd' => $this->user,
+            'data' => $this->coversRepo->getconversation($this->user->id),
         ]); 
     }
 
@@ -46,9 +43,10 @@ public function __construct(ConversationsRepository $conversationsRepository, Au
      */
     public function sendMessage(StoreMessageRequest $request)
     {
+        $this->user = Auth::user();
         $message = $this->coversRepo->create_message(
             $request->content,
-            $this->auth->user()->id,
+            $this->user->id,
             $request->to_id
         );
         broadcast(new NewMessage($message));
@@ -65,43 +63,16 @@ public function __construct(ConversationsRepository $conversationsRepository, Au
      */
     public function getMessageFor(Request $request)
     {
+        $this->user = Auth::user();
+        $request->validate([
+            'user_id' => 'exists:App\Models\User,id'
+        ]);
         return response()->json([
             'status' => 'success',
             'message' => 'get message for',
             'code' => '200',
-            'data' => $this->coversRepo->getMessageFor($this->auth->user()->id, $request->user_id)->paginate(5),
+            'data' => $this->coversRepo->getMessageFor($this->user->id, $request->user_id)->paginate(5),
         ]); 
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Conversation $conversation)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Conversation $conversation)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Conversation $conversation)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Conversation $conversation)
-    {
-        //
-    }
 }
