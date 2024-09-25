@@ -2,7 +2,7 @@
 
 namespace App\Notifications;
 
-use Ichtrojan\Otp\Models\Otp;
+use Ichtrojan\Otp\Otp;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -26,7 +26,7 @@ class ResetPasswordNotification extends Notification
         $this->subject='password resetting';
         $this->fromEmail='test@gmail.com';
         $this->mailer='smtp';
-        $this->otp=new Otp();
+        $this->otp = new Otp();
     }
 
     /**
@@ -44,7 +44,8 @@ class ResetPasswordNotification extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $otp=$this->otp->generate($notifiable->email, 'numeric', 6, 15);
+        $otp = $this->otp->generate($notifiable->email, 'numeric', 5, 15);
+
         return (new MailMessage)
             ->mailer('smtp')
             ->subject($this->subject)

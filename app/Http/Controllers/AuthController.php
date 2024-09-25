@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Validator;
 use Laravel\Socialite\Facades\Socialite;
 use App\Notifications\ResetPasswordNotification;
 use Ichtrojan\Otp\Models\Otp as Model;
+use Ichtrojan\Otp\Otp;
 
 class AuthController extends Controller
 {
@@ -22,11 +23,14 @@ class AuthController extends Controller
      */
     protected User $user;
 
+    private $otp;
+
 
     public function __construct(User $user)
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register']]);
+        // $this->middleware('auth:api', ['except' => ['login', 'register']]);
         $this->user = $user;
+        $this->otp = new Otp();
     }
 
     /**
@@ -200,11 +204,11 @@ class AuthController extends Controller
     public function codeCheck(Request $request)
     {
         $request->validate([
-            'code' => 'required|string|exists:reset_code_passwords',
+            'code' => 'required|string',
             'email' => 'required|email',
         ]);
 
-        $otp2 = $this->validate_code_opt($request->email, $request->otp);
+        $otp2 = $this->validate_code_opt($request->email, $request->code);
 
         if(!$otp2->status){
 
@@ -224,11 +228,7 @@ class AuthController extends Controller
        
     }
 
-    /**
-     * @param string $identifier
-     * @param string $token
-     * @return mixed
-     */
+  
     public function validate_code_opt(string $identifier, string $token): object
     {
         $otp = Model::where('identifier', $identifier)->where('token', $token)->first();
@@ -292,7 +292,8 @@ class AuthController extends Controller
                 'status' => false
             ]);
         }
-        $user->notify(new ResetPasswordNotification());
+        // $user->notify(new ResetPasswordNotification());
+        $otp = $this->otp->generate($user->email, 'numeric', 5, 15);
         
         return response()->json([
             'message' =>'Nous avons envoyé un code dans votre boite mail.',
