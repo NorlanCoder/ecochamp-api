@@ -387,7 +387,7 @@ class PostController extends Controller
             'message'       => $request->message,
             'country'       => isset($request->country)? $request->country : null,
             'city'      => isset($request->city)? $request->city : null,
-            'distributed_to'        => isset($request->distributed_to)? $request->distributed_to : null,
+            'distributed_to' => isset($request->distributed_to)? $request->distributed_to : null,
             'type_id'       => $request->type_id,
             'status'        => isset($request->status)? $request->status : null,
             'start_date'        => isset($request->start_date)? $request->start_date : null,

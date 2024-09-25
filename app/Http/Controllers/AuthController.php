@@ -9,15 +9,20 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Socialite\Facades\Socialite;
+use App\Notifications\ResetPasswordNotification;
+use Ichtrojan\Otp\Models\Otp as Model;
 
 class AuthController extends Controller
 {
+
     /**
      * Create a new AuthController instance.
      *
      * @return void
      */
     protected User $user;
+
+
     public function __construct(User $user)
     {
         $this->middleware('auth:api', ['except' => ['login', 'register']]);
@@ -40,14 +45,6 @@ class AuthController extends Controller
             return response()->json($validator->errors(), 400);
         }
 
-        // $credentials = request(['email', 'password']);
-
-        // if (!$token = auth()->attempt($credentials)) {
-        //     return response()->json([
-        //         'success' => false,
-        //         'message' => 'Identifiants incorrects'
-        //     ], 401);
-        // }
         $user = User::where('email', $request->email)->first();
         if(!$user){
             return response()->json([
@@ -62,7 +59,6 @@ class AuthController extends Controller
                 'message' => 'Password incorrects',
             ], 401);
         }
-        // return $user->createToken("API TOKEN")->accessToken;
         return response()->json([
             'status' => true,
             'message' => 'L\'utilisateur s\'est connecté avec succès',
@@ -80,8 +76,7 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'firstname' => ['required', 'string', 'max:255'],
-            'lastname' => ['required', 'string', 'max:255'],
+            'fullname' => ['required', 'string'],
             'phone_number' => ['required', 'max:255', 'regex:/^[\+]?[(]?[0-9 ]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/', 'unique:users,phone_number'],
             'country' => ['required', 'string', 'max:255'],
             'city' => ['required', 'string', 'max:255'],
@@ -95,8 +90,7 @@ class AuthController extends Controller
         }
 
         $user = User::create([
-            'firstname' => $request->firstname,
-            'lastname' => $request->lastname,
+            'fullname' => $request->fullname,
             'phone_number' => $request->phone_number,
             'country' => $request->country,
             'city' => $request->city,
@@ -105,7 +99,6 @@ class AuthController extends Controller
             'email' => $request->email
         ]);
 
-        // $token = $user->createToken("API TOKEN")->accessToken;
 
         return response()->json([
             'status' => true,
@@ -116,7 +109,7 @@ class AuthController extends Controller
     }
 
     /**
-     * updatePassword
+     * update Password
      *
      * @return \Illuminate\Http\JsonResponse
      */
@@ -147,7 +140,7 @@ class AuthController extends Controller
     }
 
     /**
-     * respondWithToken
+     * respond With Token
      *
      * @return \Illuminate\Http\JsonResponse
      */
@@ -194,5 +187,155 @@ class AuthController extends Controller
             'success' => true,
             'token' => $token
         ]);
+    }
+
+    /**
+     * Verification code reset password
+     * 
+     * @unauthenticated
+     * 
+     * @param Request $request
+     * @return User
+    */
+    public function codeCheck(Request $request)
+    {
+        $request->validate([
+            'code' => 'required|string|exists:reset_code_passwords',
+            'email' => 'required|email',
+        ]);
+
+        $otp2 = $this->validate_code_opt($request->email, $request->otp);
+
+        if(!$otp2->status){
+
+            return response()->json([
+                'status' => false,
+                'code' => 401,
+                'message' => 'Le code est expiré',
+                'error'=>$otp2
+            ]);
+        }
+
+        return response()->json([
+            'status' => true,
+            'code' => 200,
+            'message' => 'Le code est valide',
+        ]);
+       
+    }
+
+    /**
+     * @param string $identifier
+     * @param string $token
+     * @return mixed
+     */
+    public function validate_code_opt(string $identifier, string $token): object
+    {
+        $otp = Model::where('identifier', $identifier)->where('token', $token)->first();
+
+        if ($otp instanceof Model) {
+            if ($otp->valid) {
+                $now = now();
+                $validity = $otp->created_at->addMinutes($otp->validity);
+
+                $otp->update(['valid' => false]);
+
+                if (strtotime($validity) < strtotime($now)) {
+                    return (object)[
+                        'status' => false,
+                        'message' => 'OTP Expired'
+                    ];
+                }
+
+                $otp->update(['valid' => false]);
+
+                return (object)[
+                    'status' => true,
+                    'message' => 'OTP is valid'
+                ];
+            }
+
+            $otp->update(['valid' => false]);
+
+            return (object)[
+                'status' => false,
+                'message' => 'OTP is not valid'
+            ];
+        } else {
+            return (object)[
+                'status' => false,
+                'message' => 'OTP does not exist'
+            ];
+        }
+    }
+
+
+    /**
+     * Forgot Password
+     * 
+     * @unauthenticated
+     * 
+     * @param Request $request
+     * @return User
+    */
+    public function forgotPassword(Request $request)
+    {
+        $data = $request->validate([
+            'email' => 'required|email|exists:users',
+        ]);
+        $input = $request->only('email');
+        $user = User::where('email',$input)->first();
+        if (!$user){
+            return response()->json([
+                'message' =>'Email invalide',
+                'code' => 401,
+                'status' => false
+            ]);
+        }
+        $user->notify(new ResetPasswordNotification());
+        
+        return response()->json([
+            'message' =>'Nous avons envoyé un code dans votre boite mail.',
+            'code' => 200,
+            'status' => true
+        ]);
+    }
+
+    /**
+     * Change the password (Setp 3)
+     * 
+     * @unauthenticated
+     *
+     * @param  mixed $request
+     * @return void
+     */
+    public function resetPassword(Request $request)
+    {
+
+        $validateUser = Validator::make($request->all(), 
+        [
+            'email' => 'required|string|email',
+            'password' => 'required|string|min:6',
+        ]);
+
+        if($validateUser->fails()){
+
+                return response()->json([
+                    'status' => false,
+                    'message' => $validateUser->errors()
+                ]);
+        }
+
+        $user = User::firstWhere('email', $request->email);
+
+        $user->update($request->only('password'));
+
+        return response()->json([
+            'status' => true,
+            'code' => 200,
+            'message' => 'Mot de passe mise à jour.', 
+            'data' => $user
+        ]);
+
     }
 }

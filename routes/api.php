@@ -88,8 +88,12 @@ Route::post('action/update', [ActionController::class, 'updateAction']);
 Route::post('action/delete', [ActionController::class, 'deleteAction']);
  
 
-Route::post('password/forgot', [ForgotPasswordController::class, 'forgotPassword']);
-Route::post('password/reset', [ResetPasswordController::class, 'resetPassword']);
+Route::controller(AuthController::class)->group(function () {
+    Route::post('password/email',  'forgotPassword');
+    Route::post('password/code/check', 'codeCheck');
+    Route::post('password/reset', 'resetPassword');
+});
+
 Route::get('social/login', [AuthController::class, 'socialLogin']);
 
 

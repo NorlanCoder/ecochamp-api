@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 
 class ActionController extends Controller
 {
+    
     /**
      * list action post.
      */
