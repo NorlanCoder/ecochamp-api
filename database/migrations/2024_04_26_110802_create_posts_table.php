@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('country')->nullable();
             $table->string('city')->nullable();
             $table->string('distributed_to')->default('all');
-            $table->foreignId('type_id')->constrained('post_types')->onDelete('cascade');
+            // $table->foreignId('type_id')->constrained('post_types')->onDelete('cascade');
             $table->string('status')->nullable();
             $table->dateTime('start_date')->nullable();
             $table->dateTime('end_date')->nullable();

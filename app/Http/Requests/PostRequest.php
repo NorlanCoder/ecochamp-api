@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Enums\ActionStatus;
 use App\Enums\Distributed_to;
+use App\Enums\PostType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
@@ -29,7 +30,7 @@ class PostRequest extends FormRequest
             'title' => 'required|string',
             'message' => 'required|string',
             'distributed_to' => [Rule::enum(Distributed_to::class)],
-            'type_id' => 'exists:App\Models\PostType,id',
+            'type' => [Rule::enum(PostType::class)],
             'status' => [Rule::enum(ActionStatus::class)],
             'start_date' => 'date',
             'end_date' => 'required_with:start_date|date|after:start_date',

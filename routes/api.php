@@ -39,10 +39,11 @@ Route::group([
     Route::post('me', [AuthController::class, 'me']);
 });
 
+Route::get('post', [PostController::class, 'getPost']);
+Route::get('get/alerte', [PostController::class, 'getAllAlerte']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
 
-    Route::get('post', [PostController::class, 'getPost']);
     Route::post('post/create', [PostController::class, 'createPost']);
     Route::post('post/update', [PostController::class, 'updatePost']);
     Route::post('post/delete', [PostController::class, 'deletePost']);

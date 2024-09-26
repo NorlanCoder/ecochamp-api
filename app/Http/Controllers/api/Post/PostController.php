@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Post;
 
 use App\Enums\Distributed_to;
+use App\Enums\PostType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PostReactionRequest;
 use App\Http\Requests\PostRequest;
@@ -108,6 +109,26 @@ class PostController extends Controller
 
 
     /**
+     * Alerte Post
+     */
+    public function getAllAlerte(Request $request)
+    {
+        $post = Post::where('type', PostType::Alerte)
+        ->with('postMedias')
+        ->with('postReactions')
+        ->with('tags')
+        ->orderByDesc('created_at')->paginate(20);
+
+        return response()->json([
+            'status' => 'sucess',
+            'message' => 'Alerte',
+            'code' => '200',
+            'data' => $post,
+        ]); 
+    }
+
+
+    /**
      * getPost
      */
     public function getPost(Request $request)
@@ -150,8 +171,8 @@ class PostController extends Controller
             'message'       => $request->message,
             'country'       => isset($request->country)? $request->country : null,
             'city'      => isset($request->city)? $request->city : null,
-            'distributed_to'        => isset($request->distributed_to)? $request->distributed_to : Distributed_to::PEOPLE,
-            'type_id'       => $request->type_id,
+            'distributed_to'        => isset($request->distributed_to)? $request->distributed_to : Distributed_to::ALL,
+            'type'       => $request->type,
             'status'        => isset($request->status)? $request->status : null,
             'start_date'        => isset($request->start_date)? $request->start_date : null,
             'end_date'      => isset($request->end_date)? $request->end_date : null,
@@ -162,7 +183,7 @@ class PostController extends Controller
                 if(!$new_tag){
                     $new_tag = Tag::create(['label' => $label, 'count' => 0]);
                 }
-                $new_tag->count += 1;
+                $new_tag->increment('count');
                 $new_tag->save();
             }
         }
@@ -172,7 +193,7 @@ class PostController extends Controller
                 $img = time() . $image->getClientOriginalName();
                 $path = $image->move(public_path() . "\post", $img);
                 $media = Media::create([
-                    'madia_url' => $path,
+                    'url_media' => $path,
                 ]);
                 PostMedia::create([
                     'post_id' => $post->id,
@@ -412,7 +433,7 @@ class PostController extends Controller
                 if(!$new_tag){
                     $new_tag = Tag::create(['label' => $label, 'count' => 0]);
                 }
-                $new_tag->count += 1;
+                $new_tag->increment('count');
                 $new_tag->save();
             }
         }
@@ -425,7 +446,7 @@ class PostController extends Controller
                 $img = time() . $image->getClientOriginalName();
                 $path = $image->move(public_path() . "\post", $img);
                 $media = Media::create([
-                    'madia_url' => $path,
+                    'url_media' => $path,
                 ]);
                 PostMedia::create([
                     'post_id' => $post->id,
