@@ -19,16 +19,20 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        // User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        $user = User::factory()->create([
+            'fullname' => 'Test User',
+            'email' => 'test@example.com',
+            'phone_number' => '+22960987654',
+            'country' => 'Benin',
+            'city' => 'Cotonou',
+            'gender' => 'masculin',
+        ]);
 
         $alert = ['feu', 'vent', 'foret'];
-        $medias = ['post/image1', 'post/image5'];
+        $medias = ['post/image1.jpg', 'post/image5.jpg'];
         
         $post = Post::create([
-            'user_id'       => 7,
+            'user_id'       => $user->id,
             'title'         => 'Test Alerte',
             'message'       => 'Feu de foret',
             'country'       => 'Benin',
@@ -59,10 +63,10 @@ class DatabaseSeeder extends Seeder
         
         // Deuxième alerte
         $alert = ['terrain', 'sèche'];
-        $medias = ['post/image2', 'post/image4'];
+        $medias = ['post/image2.jpg', 'post/image4.jpg'];
         
         $post = Post::create([
-            'user_id'       => 7,
+            'user_id'       => $user->id,
             'title'         => 'Test Alerte',
             'message'       => 'Terrain sèche',
             'country'       => 'Benin',
