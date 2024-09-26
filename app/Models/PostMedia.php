@@ -17,6 +17,7 @@ class PostMedia extends Model
         'remove'
     ];
 
+
     public function post(): BelongsTo
     {
         return $this->belongsTo(Post::class);
@@ -25,6 +26,11 @@ class PostMedia extends Model
     public function media(): BelongsTo
     {
         return $this->belongsTo(Media::class);
+    }
+
+    public function getUrlMediaAttribute()
+    {
+        return $this->media ? $this->media->url_media : null;
     }
 
 }

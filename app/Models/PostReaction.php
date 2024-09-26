@@ -14,7 +14,7 @@ class PostReaction extends Model
     [
         'post_id',
         'user_id',
-        'reaction_id',
+        'reaction',
         'remove'
     ];
     
@@ -28,8 +28,8 @@ class PostReaction extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function reaction(): BelongsTo
-    {
-        return $this->belongsTo(Reaction::class);
-    }
+    // public function reaction(): BelongsTo
+    // {
+    //     return $this->belongsTo(Reaction::class);
+    // }
 }

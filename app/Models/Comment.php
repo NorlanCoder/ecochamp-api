@@ -13,9 +13,16 @@ class Comment extends Model
 
     protected $guarded = [];
 
+    protected $with = ['user'];
+
     public function post(): BelongsTo
     {
         return $this->belongsTo(Post::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function reactions(): HasMany

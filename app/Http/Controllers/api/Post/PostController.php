@@ -78,10 +78,26 @@ class PostController extends Controller
                     function($query) use($id_follows){
                         $query->whereIn('user_id', $id_follows); 
                     })
-                ->with('postMedias')
+                    ->with('user')
+                ->with('user')
+                ->with('comments')
                 ->with('postReactions')
                 ->with('tags')
                 ->orderByDesc('created_at')->paginate(20);
+            
+            $post->getCollection()->transform(function($query) {
+                $images = PostMedia::where('post_id', $query->id)
+                        ->with('media')
+                        ->get()
+                        ->map(function ($postMedia) {
+                            return $postMedia->media->url_media;
+                        });
+            
+                $query->images = $images;
+            
+                return $query;
+            });
+                
         }
         else{
             $validator = $request->validate([
@@ -93,10 +109,25 @@ class PostController extends Controller
             $post = Post::where('distributed_to', '!=', Distributed_to::FOLLOWERS)
             ->orWhere('country', $country)
             ->orWhere('city', $city)
-            ->with('postMedias')
+            ->with('user')
+            ->with('comments')
             ->with('postReactions')
             ->with('tags')
             ->orderByDesc('created_at')->paginate(20);
+
+            $post->getCollection()->transform(function($query) {
+                $images = PostMedia::where('post_id', $query->id)
+                        ->with('media')
+                        ->get()
+                        ->map(function ($postMedia) {
+                            return $postMedia->media->url_media;
+                        });
+            
+                $query->images = $images;
+            
+                return $query;
+            });
+            
         }
         // return $this->getPost();
         return response()->json([
@@ -114,10 +145,25 @@ class PostController extends Controller
     public function getAllAlerte(Request $request)
     {
         $post = Post::where('type', PostType::Alerte)
-        ->with('postMedias')
+        ->with('user')
+        ->with('comments')
         ->with('postReactions')
         ->with('tags')
         ->orderByDesc('created_at')->paginate(20);
+
+        $post->getCollection()->transform(function($query) {
+            $images = PostMedia::where('post_id', $query->id)
+                    ->with('media')
+                    ->get()
+                    ->map(function ($postMedia) {
+                        return $postMedia->media->url_media;
+                    });
+        
+            $query->images = $images;
+        
+            return $query;
+        });
+        
 
         return response()->json([
             'status' => 'sucess',
