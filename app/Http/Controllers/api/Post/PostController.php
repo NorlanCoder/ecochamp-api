@@ -55,7 +55,7 @@ class PostController extends Controller
         return response()->json([
             'status' => 'sucess',
             'message' => 'post list user connect',
-            'code' => '200',
+            'code' => 200,
             'data' => $post,
         ]); 
     }
@@ -133,7 +133,7 @@ class PostController extends Controller
         return response()->json([
             'status' => 'sucess',
             'message' => 'post list user connect all plateforme',
-            'code' => '200',
+            'code' => 200,
             'data' => $post,
         ]); 
     }
@@ -147,7 +147,6 @@ class PostController extends Controller
         $post = Post::where('type', PostType::Alerte)
         ->with('user')
         ->with('comments')
-        ->with('postReactions')
         ->with('tags')
         ->orderByDesc('created_at')->paginate(20);
 
@@ -158,8 +157,11 @@ class PostController extends Controller
                     ->map(function ($postMedia) {
                         return $postMedia->media->url_media;
                     });
-        
+            $postReactions = PostReaction::where('post_id', $query->id)
+            ->where('remove', false)->get();
+            
             $query->images = $images;
+            $query->post_reactions = $postReactions;
         
             return $query;
         });
@@ -168,7 +170,7 @@ class PostController extends Controller
         return response()->json([
             'status' => 'sucess',
             'message' => 'Alerte',
-            'code' => '200',
+            'code' => 200,
             'data' => $post,
         ]); 
     }
@@ -199,7 +201,7 @@ class PostController extends Controller
         return response()->json([
             'status' => 'sucess',
             'message' => 'post get',
-            'code' => '200',
+            'code' => 200,
             'data' => $post,
         ]); 
     }
@@ -260,7 +262,7 @@ class PostController extends Controller
         return response()->json([
             'status' => 'sucess',
             'message' => 'post create',
-            'code' => '200',
+            'code' => 200,
             'data' => $post,
         ]); 
         
@@ -284,7 +286,7 @@ class PostController extends Controller
         return response()->json([
             'status' => 'sucess',
             'message' => 'post partage',
-            'code' => '200',
+            'code' => 200,
             'data' => $post,
             ]);
     }
@@ -319,7 +321,7 @@ class PostController extends Controller
         return response()->json([
             'status' => 'sucess',
             'message' => 'action user ajouter avec succes',
-            'code' => '200',
+            'code' => 200,
             'data' => $postAction,
             ]);
     }
@@ -341,42 +343,39 @@ class PostController extends Controller
         }
         $postReaction = PostReaction::where('user_id',  $this->user->id)
             ->where('post_id', $post->id)->first();
+        
+        if(!$postReaction) {
+
+            $postReaction = PostReaction::create([
+                'user_id' => $this->user->id,
+                'post_id' => $post->id,
+                'reaction' => $request->reaction,
+            ]);
+        }
 
         if($postReaction){
-            if($request->reaction_id === $postReaction->reaction_id){
+            if(!$postReaction->remove){
                 $postReaction->update([
                     'remove' => true,
+                    'reaction' => $request->reaction,
                 ]);
                 return response()->json([
                     'status' => 'sucess',
                     'message' => 'reaction supprimer avec succes',
-                    'code' => '200',
-                    'data' => $post,
-                    ]);
-            }
-            else if($request->reaction_id != $postReaction->reaction_id) {
-
-                $postReaction->update([
-                    'user_id' => $this->user->id,
-                    'post_id' => $post->id,
-                    'reaction_id' => $request->reaction_id,
+                    'code' => 200,
+                    'data' => $postReaction,
                 ]);
-                return response()->json([
-                    'status' => 'sucess',
-                    'message' => 'reaction modifie avec succes',
-                    'code' => '200',
-                    'data' => $post,
-                    ]);
             }
             else{
                 $postReaction->update([
                     'remove' => false,
+                    'reaction' => $request->reaction,
                 ]);
                 return response()->json([
                     'status' => 'sucess',
                     'message' => 'reaction ajouter avec succes',
-                    'code' => '200',
-                    'data' => $post,
+                    'code' => 200,
+                    'data' => $postReaction,
                     ]);
             }
         }
@@ -389,7 +388,7 @@ class PostController extends Controller
         return response()->json([
             'status' => 'sucess',
             'message' => 'reaction ajouter avec succes',
-            'code' => '200',
+            'code' => 200,
             'data' => $post,
             ]);
     }
@@ -418,7 +417,7 @@ class PostController extends Controller
         return response()->json([
             'status' => 'sucess',
             'message' => 'postReaction delete',
-            'code' => '200',
+            'code' => 200,
             'data' => null,
         ]); 
     }
@@ -504,7 +503,7 @@ class PostController extends Controller
         return response()->json([
             'status' => 'sucess',
             'message' => 'post mise à jour',
-            'code' => '200',
+            'code' => 200,
             'data' => $post,
         ]); 
     }
@@ -533,7 +532,7 @@ class PostController extends Controller
         return response()->json([
             'status' => 'sucess',
             'message' => 'post delete',
-            'code' => '200',
+            'code' => 200,
             'data' => null,
         ]); 
     }

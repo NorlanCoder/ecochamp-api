@@ -19,7 +19,7 @@ class ActionController extends Controller
         return response()->json([
             'status' => 'sucess',
             'message' => 'action listes',
-            'code' => '200',
+            'code' => 200,
             'data' => $actions,
         ]);
     }
@@ -42,7 +42,7 @@ class ActionController extends Controller
         return response()->json([
             'status' => 'sucess',
             'message' => 'action create',
-            'code' => '200',
+            'code' => 200,
             'data' => $action,
         ]);
     }
@@ -91,7 +91,7 @@ class ActionController extends Controller
         return response()->json([
             'status' => 'sucess',
             'message' => 'action update',
-            'code' => '200',
+            'code' => 200,
             'data' => $action,
         ]);
     }
@@ -119,7 +119,7 @@ class ActionController extends Controller
         return response()->json([
             'status' => 'sucess',
             'message' => 'action delete',
-            'code' => '200',
+            'code' => 200,
             'data' => $action,
         ]);
     }

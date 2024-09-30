@@ -23,8 +23,7 @@ class PostReactionRequest extends FormRequest
     {
         return [
             'post_id' => 'exists:App\Models\Post,id',
-            'reaction_id' => 'exists:App\Models\Reaction,id',
-            // 'user_id' => 'requied',
+            'reaction' => 'required|in:liked,love',
         ];
     }
 

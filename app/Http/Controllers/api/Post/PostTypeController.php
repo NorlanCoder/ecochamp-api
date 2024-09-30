@@ -18,7 +18,7 @@ class PostTypeController extends Controller
         return response()->json([
             'status' => 'sucess',
             'message' => 'postType listes',
-            'code' => '200',
+            'code' => 200,
             'data' => $postTypes,
         ]);
     }
@@ -41,7 +41,7 @@ class PostTypeController extends Controller
         return response()->json([
             'status' => 'sucess',
             'message' => 'postType create',
-            'code' => '200',
+            'code' => 200,
             'data' => $postType,
         ]);
     }
@@ -98,7 +98,7 @@ class PostTypeController extends Controller
         return response()->json([
             'status' => 'sucess',
             'message' => 'postType update',
-            'code' => '200',
+            'code' => 200,
             'data' => $postType,
         ]);
     }
@@ -126,7 +126,7 @@ class PostTypeController extends Controller
         return response()->json([
             'status' => 'sucess',
             'message' => 'postType delete',
-            'code' => '200',
+            'code' => 200,
             'data' => $postType,
         ]);
     }

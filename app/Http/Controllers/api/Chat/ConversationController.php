@@ -32,7 +32,7 @@ class ConversationController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'list conversations',
-            'code' => '200',
+            'code' => 200,
             // 'dd' => $this->user,
             'data' => $this->coversRepo->getconversation($this->user->id),
         ]); 
@@ -53,7 +53,7 @@ class ConversationController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'send message',
-            'code' => '200',
+            'code' => 200,
             'data' => $message,
         ]); 
     }
@@ -70,7 +70,7 @@ class ConversationController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'get message for',
-            'code' => '200',
+            'code' => 200,
             'data' => $this->coversRepo->getMessageFor($this->user->id, $request->user_id)->paginate(5),
         ]); 
     }

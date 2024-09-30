@@ -31,7 +31,7 @@ class UserController extends Controller
         return response()->json([
             'status' => 'sucess',
             'message' => 'user followers',
-            'code' => '200',
+            'code' => 200,
             'data' => $followers,
         ]);
     }
@@ -62,7 +62,7 @@ class UserController extends Controller
         return response()->json([
             'status' => 'sucess',
             'message' => 'post partage',
-            'code' => '200',
+            'code' => 200,
             'data' => $follow,
         ]);
     }
@@ -96,7 +96,7 @@ class UserController extends Controller
         return response()->json([
             'status' => 'sucess',
             'message' => 'user mise à jour image du profile',
-            'code' => '200',
+            'code' => 200,
             'data' => $user,
         ]);
     }
@@ -130,7 +130,7 @@ class UserController extends Controller
         return response()->json([
             'status' => 'sucess',
             'message' => 'user mise à jour image du couverture',
-            'code' => '200',
+            'code' => 200,
             'data' => $user,
         ]);
     }
