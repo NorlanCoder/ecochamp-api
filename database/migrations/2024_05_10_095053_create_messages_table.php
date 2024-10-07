@@ -11,14 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('messages', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('from_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('to_id')->constrained('users')->onDelete('cascade');
-            $table->text('content');
-            $table->timestamps('red_at');
-            $table->timestamps();
-        });
+        {
+            Schema::create('messages', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('from_id')->constrained('users')->onDelete('cascade');
+                $table->foreignId('to_id')->constrained('users')->onDelete('cascade');
+                $table->text('content');
+                $table->timestamps();
+            });
+        }
     }
 
     /**

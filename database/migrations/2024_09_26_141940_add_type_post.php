@@ -13,7 +13,7 @@ return new class extends Migration
     {
         if (!Schema::hasColumn('posts', 'image')) {
             Schema::table('posts', function (Blueprint $table) {
-                $table->enum('type', ['alerte', 'post', 'evennement'])->default('post');
+                $table->enum('type', ['alerte', 'post', 'evennement']);
             });
         }
     }

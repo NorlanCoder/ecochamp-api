@@ -20,6 +20,7 @@ use App\Models\PostShare;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class PostController extends Controller
@@ -213,33 +214,37 @@ class PostController extends Controller
     {
         $validated = $request->validated();
         $this->user = Auth::user();
+        Log::info($request);
         $post = Post::create([
-            'user_id'       => $this->user->id,
-            'title'     => $request->title,
-            'message'       => $request->message,
-            'country'       => isset($request->country)? $request->country : null,
-            'city'      => isset($request->city)? $request->city : null,
-            'distributed_to'        => isset($request->distributed_to)? $request->distributed_to : Distributed_to::ALL,
-            'type'       => $request->type,
-            'status'        => isset($request->status)? $request->status : null,
-            'start_date'        => isset($request->start_date)? $request->start_date : null,
-            'end_date'      => isset($request->end_date)? $request->end_date : null,
+            'user_id' => $this->user->id,
+            'title' => $request->title,
+            'message' => $request->message,
+            'country' => isset($request->country)? $request->country : null,
+            'city' => isset($request->city)? $request->city : null,
+            'distributed_to' => isset($request->distributed_to)? $request->distributed_to : Distributed_to::ALL,
+            'type' => $request->type,
+            'status' => isset($request->status)? $request->status : null,
+            'start_date' => isset($request->start_date)? $request->start_date : null,
+            'end_date' => isset($request->end_date)? $request->end_date : null,
         ]);
-        if ($request->tags){
+        if (count($request->tags)){
+            // dd($request->tags);
             foreach ($request->tags as $label) {
-                $new_tag = Tag::where('label', $label);
-                if(!$new_tag){
+                $new_tag = Tag::where('label', $label)->get();
+                if(!count($new_tag)){
                     $new_tag = Tag::create(['label' => $label, 'count' => 0]);
                 }
-                $new_tag->increment('count');
-                $new_tag->save();
+                // $new_tag->increment('count');
+                // $new_tag->save();
             }
         }
-        if($request->medias){
-                    
-            foreach ($request->images as $image) {
+        if(count($request->medias)){
+
+            foreach ($request->medias as $image) {
                 $img = time() . $image->getClientOriginalName();
-                $path = $image->move(public_path() . "\post", $img);
+
+                $path = $image->move("post", $img);
+                $path = 'post/'.$img;
                 $media = Media::create([
                     'url_media' => $path,
                 ]);
@@ -251,21 +256,21 @@ class PostController extends Controller
             }
         }
         if($request->actions){
-                    
+
             foreach ($request->actions as $action) {
                 $post_action = PostAction::create([
                     'post_id' => $post->id,
-                    'action_id' => $action->id,
+                    'action_id' => intval($action),
                 ]);
             }
         }
         return response()->json([
             'status' => 'sucess',
-            'message' => 'post create',
-            'code' => 200,
+            'message' => 'Post créer avec succès',
+            'code' => '200',
             'data' => $post,
-        ]); 
-        
+        ]);
+
     }
 
     /**
