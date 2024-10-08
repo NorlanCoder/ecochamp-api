@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\Post\PostTypeController;
 // use App\Http\Controllers\Api\Chat\ConversationController;
 use App\Http\Controllers\Api\Chat\MessageController;
 use App\Http\Controllers\api\ReactionController;
+use App\Http\Controllers\Api\User\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -68,6 +69,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('conversation/message/list/for', [ConversationController::class, 'getMessageFor']);
     Route::post('conversation/message/send', [ConversationController::class, 'sendMessage']);
 
+    Route::controller(UserController::class)->group(function () {
+        // Route::put('notification/token/refresh', 'refresh_token_notify');
+        // Route::get('notifications', 'notifications');
+        Route::put('user/update', 'update_info');
+        Route::post('user/update/profile', 'pictureProfile');
+        Route::post('user/update/cover', 'coverProfil');
+        Route::put('user/modifie/password', 'modifyPassword');
+    });
 });
 
 Route::post('reaction/create', [ReactionController::class, 'createReaction']);
@@ -75,7 +84,9 @@ Route::post('reaction/create', [ReactionController::class, 'createReaction']);
 
 Route::post('login', [AuthController::class, 'login'])->name('login');
 Route::post('register', [AuthController::class, 'register'])->name('register');
-Route::post('posts/users', [PostController::class, 'getPostUsers']);
+Route::post('user/posts', [PostController::class, 'getPostUsers']);
+Route::post('user/alertes', [PostController::class, 'getAlerteUsers']);
+Route::post('user/evennements', [PostController::class, 'getEvennementUsers']);
 
 //// PostType
 Route::get('postType/list', [PostTypeController::class, 'postTypeList']);

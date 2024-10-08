@@ -63,7 +63,7 @@ class PostController extends Controller
     }
 
     /**
-     * getPostUsers
+     * get Posts User
      */
     public function getPostUsers(Request $request)
     {
@@ -74,7 +74,7 @@ class PostController extends Controller
             foreach ($follows as $follow){
                 array_push($id_follows, $follow->id);
             }
-            $post = Post::where('country', $this->user->country)
+            $post = Post::where('type', PostType::Post)->where('country', $this->user->country)
                 ->orWhere('city', $this->user->city)
                 ->OrwhereIn(
                     function($query) use($id_follows){
@@ -108,7 +108,85 @@ class PostController extends Controller
             ]);
             $country = $request->country;
             $city = $request->city;
-            $post = Post::where('distributed_to', '!=', Distributed_to::FOLLOWERS)
+            $post = Post::where('type', PostType::Post)->where('distributed_to', '!=', Distributed_to::FOLLOWERS)
+            ->orWhere('country', $country)
+            ->orWhere('city', $city)
+            ->with('user')
+            ->with('comments')
+            ->with('postReactions')
+            ->with('tags')
+            ->orderByDesc('created_at')->paginate(20);
+
+            $post->getCollection()->transform(function($query) {
+                $images = PostMedia::where('post_id', $query->id)
+                        ->with('media')
+                        ->get()
+                        ->map(function ($postMedia) {
+                            return $postMedia->media->url_media;
+                        });
+            
+                $query->images = $images;
+            
+                return $query;
+            });
+            
+        }
+        // return $this->getPost();
+        return response()->json([
+            'status' => 'sucess',
+            'message' => 'post list user connect all plateforme',
+            'code' => 200,
+            'data' => $post,
+        ]); 
+    }
+
+    /**
+     * get Evennements User
+     */
+    public function getEvennementUsers(Request $request)
+    {
+        $this->user = Auth::user();
+        if($this->user){
+            $follows = Follow::where('follower_user_id', $this->user->id)->get();
+            $id_follows = [];
+            foreach ($follows as $follow){
+                array_push($id_follows, $follow->id);
+            }
+            $post = Post::where('type', PostType::Evennement)->where('country', $this->user->country)
+                ->orWhere('city', $this->user->city)
+                ->OrwhereIn(
+                    function($query) use($id_follows){
+                        $query->whereIn('user_id', $id_follows); 
+                    })
+                    ->with('user')
+                ->with('user')
+                ->with('comments')
+                ->with('postReactions')
+                ->with('tags')
+                ->orderByDesc('created_at')->paginate(20);
+            
+            $post->getCollection()->transform(function($query) {
+                $images = PostMedia::where('post_id', $query->id)
+                        ->with('media')
+                        ->get()
+                        ->map(function ($postMedia) {
+                            return $postMedia->media->url_media;
+                        });
+            
+                $query->images = $images;
+            
+                return $query;
+            });
+                
+        }
+        else{
+            $validator = $request->validate([
+                'country' => ['required'],
+                'city' => ['required'],
+            ]);
+            $country = $request->country;
+            $city = $request->city;
+            $post = Post::where('type', PostType::Evennement)->where('distributed_to', '!=', Distributed_to::FOLLOWERS)
             ->orWhere('country', $country)
             ->orWhere('city', $city)
             ->with('user')
@@ -172,6 +250,84 @@ class PostController extends Controller
         return response()->json([
             'status' => 'sucess',
             'message' => 'Alerte',
+            'code' => 200,
+            'data' => $post,
+        ]); 
+    }
+
+    /**
+     * get Alertes User
+     */
+    public function getAlerteUsers(Request $request)
+    {
+        $this->user = Auth::user();
+        if($this->user){
+            $follows = Follow::where('follower_user_id', $this->user->id)->get();
+            $id_follows = [];
+            foreach ($follows as $follow){
+                array_push($id_follows, $follow->id);
+            }
+            $post = Post::where('type', PostType::Alerte)->where('country', $this->user->country)
+                ->orWhere('city', $this->user->city)
+                ->OrwhereIn(
+                    function($query) use($id_follows){
+                        $query->whereIn('user_id', $id_follows); 
+                    })
+                    ->with('user')
+                ->with('user')
+                ->with('comments')
+                ->with('postReactions')
+                ->with('tags')
+                ->orderByDesc('created_at')->paginate(20);
+            
+            $post->getCollection()->transform(function($query) {
+                $images = PostMedia::where('post_id', $query->id)
+                        ->with('media')
+                        ->get()
+                        ->map(function ($postMedia) {
+                            return $postMedia->media->url_media;
+                        });
+            
+                $query->images = $images;
+            
+                return $query;
+            });
+                
+        }
+        else{
+            $validator = $request->validate([
+                'country' => ['required'],
+                'city' => ['required'],
+            ]);
+            $country = $request->country;
+            $city = $request->city;
+            $post = Post::where('type', PostType::Alerte)->where('distributed_to', '!=', Distributed_to::FOLLOWERS)
+            ->orWhere('country', $country)
+            ->orWhere('city', $city)
+            ->with('user')
+            ->with('comments')
+            ->with('postReactions')
+            ->with('tags')
+            ->orderByDesc('created_at')->paginate(20);
+
+            $post->getCollection()->transform(function($query) {
+                $images = PostMedia::where('post_id', $query->id)
+                        ->with('media')
+                        ->get()
+                        ->map(function ($postMedia) {
+                            return $postMedia->media->url_media;
+                        });
+            
+                $query->images = $images;
+            
+                return $query;
+            });
+            
+        }
+        // return $this->getPost();
+        return response()->json([
+            'status' => 'sucess',
+            'message' => 'post list user connect all plateforme',
             'code' => 200,
             'data' => $post,
         ]); 
@@ -287,7 +443,7 @@ class PostController extends Controller
     {
         $validated = $request->validated();
         $this->user = Auth::user();
-        Log::info($request);
+        // Log::info($request);
         $post = Post::create([
             'user_id'       => $this->user->id,
             'title'     => $request->title,
