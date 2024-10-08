@@ -41,6 +41,8 @@ Route::group([
 
 Route::get('post', [PostController::class, 'getPost']);
 Route::get('get/alerte', [PostController::class, 'getAllAlerte']);
+Route::get('get/post', [PostController::class, 'getAllPost']);
+Route::get('get/evennement', [PostController::class, 'getAllEvennement']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
 

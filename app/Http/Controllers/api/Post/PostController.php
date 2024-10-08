@@ -19,6 +19,7 @@ use App\Models\PostReaction;
 use App\Models\PostShare;
 use App\Models\Tag;
 use Illuminate\Http\Request;
+use Illuminate\Log\Logger;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -176,6 +177,78 @@ class PostController extends Controller
         ]); 
     }
 
+    /**
+     * Evennement Post
+     */
+    public function getAllEvennement(Request $request)
+    {
+        $post = Post::where('type', PostType::Evennement)
+        ->with('user')
+        ->with('comments')
+        ->with('tags')
+        ->orderByDesc('created_at')->paginate(20);
+
+        $post->getCollection()->transform(function($query) {
+            $images = PostMedia::where('post_id', $query->id)
+                    ->with('media')
+                    ->get()
+                    ->map(function ($postMedia) {
+                        return $postMedia->media->url_media;
+                    });
+            $postReactions = PostReaction::where('post_id', $query->id)
+            ->where('remove', false)->get();
+            
+            $query->images = $images;
+            $query->post_reactions = $postReactions;
+        
+            return $query;
+        });
+        
+
+        return response()->json([
+            'status' => 'sucess',
+            'message' => 'Alerte',
+            'code' => 200,
+            'data' => $post,
+        ]); 
+    }
+
+
+    /**
+     *  Post Lists
+     */
+    public function getAllPost(Request $request)
+    {
+        $post = Post::where('type', PostType::Post)
+        ->with('user')
+        ->with('comments')
+        ->with('tags')
+        ->orderByDesc('created_at')->paginate(20);
+
+        $post->getCollection()->transform(function($query) {
+            $images = PostMedia::where('post_id', $query->id)
+                    ->with('media')
+                    ->get()
+                    ->map(function ($postMedia) {
+                        return $postMedia->media->url_media;
+                    });
+            $postReactions = PostReaction::where('post_id', $query->id)
+            ->where('remove', false)->get();
+            
+            $query->images = $images;
+            $query->post_reactions = $postReactions;
+        
+            return $query;
+        });
+        
+
+        return response()->json([
+            'status' => 'sucess',
+            'message' => 'Alerte',
+            'code' => 200,
+            'data' => $post,
+        ]); 
+    }
 
     /**
      * getPost
@@ -216,35 +289,33 @@ class PostController extends Controller
         $this->user = Auth::user();
         Log::info($request);
         $post = Post::create([
-            'user_id' => $this->user->id,
-            'title' => $request->title,
-            'message' => $request->message,
-            'country' => isset($request->country)? $request->country : null,
-            'city' => isset($request->city)? $request->city : null,
-            'distributed_to' => isset($request->distributed_to)? $request->distributed_to : Distributed_to::ALL,
-            'type' => $request->type,
-            'status' => isset($request->status)? $request->status : null,
-            'start_date' => isset($request->start_date)? $request->start_date : null,
-            'end_date' => isset($request->end_date)? $request->end_date : null,
+            'user_id'       => $this->user->id,
+            'title'     => $request->title,
+            'message'       => $request->message,
+            'country'       => isset($request->country)? $request->country : null,
+            'city'      => isset($request->city)? $request->city : null,
+            'distributed_to'        => isset($request->distributed_to)? $request->distributed_to : Distributed_to::ALL,
+            'type'       => $request->type,
+            'status'        => isset($request->status)? $request->status : null,
+            'start_date'        => isset($request->start_date)? $request->start_date : null,
+            'end_date'      => isset($request->end_date)? $request->end_date : null,
         ]);
-        if (count($request->tags)){
-            // dd($request->tags);
+        if ($request->tags){
             foreach ($request->tags as $label) {
-                $new_tag = Tag::where('label', $label)->get();
-                if(!count($new_tag)){
+                $new_tag = Tag::where('label', $label);
+                if(!$new_tag){
                     $new_tag = Tag::create(['label' => $label, 'count' => 0]);
                 }
-                // $new_tag->increment('count');
+                $new_tag->increment('count');
                 // $new_tag->save();
             }
         }
-        if(count($request->medias)){
-
+        if($request->medias){
+                    
             foreach ($request->medias as $image) {
-                $img = time() . $image->getClientOriginalName();
-
-                $path = $image->move("post", $img);
-                $path = 'post/'.$img;
+                $img = time() . '-' . $image->getClientOriginalName();
+                $path = $image->move(public_path('post'), $img);
+                $path = 'post/' . $img;
                 $media = Media::create([
                     'url_media' => $path,
                 ]);
@@ -256,7 +327,7 @@ class PostController extends Controller
             }
         }
         if($request->actions){
-
+                    
             foreach ($request->actions as $action) {
                 $post_action = PostAction::create([
                     'post_id' => $post->id,
@@ -266,11 +337,11 @@ class PostController extends Controller
         }
         return response()->json([
             'status' => 'sucess',
-            'message' => 'Post créer avec succès',
-            'code' => '200',
+            'message' => 'post create',
+            'code' => 200,
             'data' => $post,
-        ]);
-
+        ]); 
+        
     }
 
     /**
@@ -349,14 +420,14 @@ class PostController extends Controller
         $postReaction = PostReaction::where('user_id',  $this->user->id)
             ->where('post_id', $post->id)->first();
         
-        if(!$postReaction) {
+        // if(!$postReaction) {
 
-            $postReaction = PostReaction::create([
-                'user_id' => $this->user->id,
-                'post_id' => $post->id,
-                'reaction' => $request->reaction,
-            ]);
-        }
+        //     $postReaction = PostReaction::create([
+        //         'user_id' => $this->user->id,
+        //         'post_id' => $post->id,
+        //         'reaction' => $request->reaction,
+        //     ]);
+        // }
 
         if($postReaction){
             if(!$postReaction->remove){
@@ -384,17 +455,17 @@ class PostController extends Controller
                     ]);
             }
         }
-        PostReaction::Create([
+        $postReaction = PostReaction::Create([
             'user_id' => $this->user->id,
             'post_id' => $post->id,
-            'reaction_id' => $request->reaction_id,
+            'reaction' => $request->reaction,
         ]);
 
         return response()->json([
             'status' => 'sucess',
             'message' => 'reaction ajouter avec succes',
             'code' => 200,
-            'data' => $post,
+            'data' => $postReaction,
             ]);
     }
 
