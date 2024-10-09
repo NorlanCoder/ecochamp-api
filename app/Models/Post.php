@@ -59,4 +59,9 @@ class Post extends Model
     {
         return $this->hasMany(PostReaction::class);
     }
+
+    public function postReactionsWithoutRemove()
+    {
+        return $this->postReactions()->where('remove', false);
+    }
 }

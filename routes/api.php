@@ -46,7 +46,14 @@ Route::get('get/post', [PostController::class, 'getAllPost']);
 Route::get('get/evennement', [PostController::class, 'getAllEvennement']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('user/posts', [PostController::class, 'getPostsUser']);
+    Route::get('user/alertes', [PostController::class, 'getAlerteUsers']);
+    Route::get('user/evennements', [PostController::class, 'getEvennementUsers']);
+    Route::get('user/alerte/reaction', [ReactionController::class, 'reactionAlerteUser']);
+    Route::get('user/evennement/reaction', [ReactionController::class, 'reactionEvennementUser']);
+    Route::get('user/post/reaction', [ReactionController::class, 'reactionPostUser']);
 
+    
     Route::post('post/create', [PostController::class, 'createPost']);
     Route::post('post/update', [PostController::class, 'updatePost']);
     Route::post('post/delete', [PostController::class, 'deletePost']);
@@ -84,9 +91,7 @@ Route::post('reaction/create', [ReactionController::class, 'createReaction']);
 
 Route::post('login', [AuthController::class, 'login'])->name('login');
 Route::post('register', [AuthController::class, 'register'])->name('register');
-Route::post('user/posts', [PostController::class, 'getPostUsers']);
-Route::post('user/alertes', [PostController::class, 'getAlerteUsers']);
-Route::post('user/evennements', [PostController::class, 'getEvennementUsers']);
+
 
 //// PostType
 Route::get('postType/list', [PostTypeController::class, 'postTypeList']);
