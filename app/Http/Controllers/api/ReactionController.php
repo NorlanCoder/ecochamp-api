@@ -59,32 +59,37 @@ class ReactionController extends Controller
     {
         $user = Auth::user();
         if($user){
-            $post_id = Post::where('type', PostType::Alerte)->select('id')->get();
-            $reactions = PostReaction::where('user_id', $user->id)
+            $reactio_ids = PostReaction::where('user_id', $user->id)
                 ->where('remove', false)
-                ->whereIn('post_id', $post_id)
-                ->with('post')
-            ->orderByDesc('created_at')->paginate(20);
-           
-            $reactions->getCollection()->transform(function($query) {
-                $images = PostMedia::where('post_id', $query->post_id)
+                ->select('post_id')->get();
+                
+            $posts = Post::whereIn('id', $reactio_ids)
+                ->where('type', PostType::Alerte)
+                ->with('user')
+                ->with('comments')
+                ->with('tags')
+                ->with('postReactionsWithoutRemove')
+                ->orderByDesc('created_at')->paginate(20);
+
+        
+            $posts->getCollection()->transform(function($query) {
+                $images = PostMedia::where('post_id', $query->id)
                         ->with('media')
                         ->get()
                         ->map(function ($postMedia) {
                             return $postMedia->media->url_media;
                         });
             
-                $query->post->images = $images;
-                $query->post->user = User::where('id', $query->user_id)->first();
+                $query->images = $images;
             
                 return $query;
             });
-               
+            
             return response()->json([
                 'status' => 'sucess',
                 'message' => 'post list user connect all plateforme',
                 'code' => 200,
-                'data' => $reactions,
+                'data' => $posts,
             ]); 
         }
         
@@ -97,23 +102,28 @@ class ReactionController extends Controller
     {
         $user = Auth::user();
         if($user){
-            $post_id = Post::where('type', PostType::Evennement)->select('id')->get();
-            $reactions = PostReaction::where('user_id', $user->id)
+            $reactio_ids = PostReaction::where('user_id', $user->id)
                 ->where('remove', false)
-                ->whereIn('post_id', $post_id)
-                ->with('post')
-            ->orderByDesc('created_at')->paginate(20);
+                ->select('post_id')->get();
+                
+            $posts = Post::whereIn('id', $reactio_ids)
+                ->where('type', PostType::Evennement)
+                ->with('user')
+                ->with('comments')
+                ->with('tags')
+                ->with('postReactionsWithoutRemove')
+                ->orderByDesc('created_at')->paginate(20);
+
            
-            $reactions->getCollection()->transform(function($query) {
-                $images = PostMedia::where('post_id', $query->post_id)
+            $posts->getCollection()->transform(function($query) {
+                $images = PostMedia::where('post_id', $query->id)
                         ->with('media')
                         ->get()
                         ->map(function ($postMedia) {
                             return $postMedia->media->url_media;
                         });
             
-                $query->post->images = $images;
-                $query->post->user = User::where('id', $query->user_id)->first();
+                $query->images = $images;
             
                 return $query;
             });
@@ -122,7 +132,7 @@ class ReactionController extends Controller
                 'status' => 'sucess',
                 'message' => 'post list user connect all plateforme',
                 'code' => 200,
-                'data' => $reactions,
+                'data' => $posts,
             ]); 
         }
         
@@ -135,32 +145,37 @@ class ReactionController extends Controller
     {
         $user = Auth::user();
         if($user){
-            $post_id = Post::where('type', PostType::Alerte)->select('id')->get();
-            $reactions = PostReaction::where('user_id', $user->id)
+            $reactio_ids = PostReaction::where('user_id', $user->id)
                 ->where('remove', false)
-                ->whereIn('post_id', $post_id)
-                ->with('post')
-            ->orderByDesc('created_at')->paginate(20);
-           
-            $reactions->getCollection()->transform(function($query) {
-                $images = PostMedia::where('post_id', $query->post_id)
+                ->select('post_id')->get();
+                
+            $posts = Post::whereIn('id', $reactio_ids)
+                ->where('type', PostType::Post)
+                ->with('user')
+                ->with('comments')
+                ->with('tags')
+                ->with('postReactionsWithoutRemove')
+                ->orderByDesc('created_at')->paginate(20);
+
+        
+            $posts->getCollection()->transform(function($query) {
+                $images = PostMedia::where('post_id', $query->id)
                         ->with('media')
                         ->get()
                         ->map(function ($postMedia) {
                             return $postMedia->media->url_media;
                         });
             
-                $query->post->images = $images;
-                $query->post->user = User::where('id', $query->user_id)->first();
+                $query->images = $images;
             
                 return $query;
             });
-               
+            
             return response()->json([
                 'status' => 'sucess',
                 'message' => 'post list user connect all plateforme',
                 'code' => 200,
-                'data' => $reactions,
+                'data' => $posts,
             ]); 
         }
         

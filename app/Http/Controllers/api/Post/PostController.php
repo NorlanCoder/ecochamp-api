@@ -166,7 +166,7 @@ class PostController extends Controller
             // $postReactions = PostReaction::where('post_id', $query->id)
             // ->where('remove', false)->get();
             
-            // $query->images = $images;
+            $query->images = $images;
             // $query->post_reactions = $postReactions;
         
             return $query;
@@ -208,7 +208,7 @@ class PostController extends Controller
                     // $postReactions = PostReaction::where('post_id', $query->id)
                     // ->where('remove', false)->get();
                     
-                    // $query->images = $images;
+                    $query->images = $images;
                     // $query->post_reactions = $postReactions;
             
                 $query->images = $images;
@@ -248,7 +248,7 @@ class PostController extends Controller
             // $postReactions = PostReaction::where('post_id', $query->id)
             // ->where('remove', false)->get();
             
-            // $query->images = $images;
+            $query->images = $images;
             // $query->post_reactions = $postReactions;
         
             return $query;
@@ -286,7 +286,7 @@ class PostController extends Controller
             // $postReactions = PostReaction::where('post_id', $query->id)
             // ->where('remove', false)->get();
             
-            // $query->images = $images;
+            $query->images = $images;
             // $query->post_reactions = $postReactions;
         
             return $query;
