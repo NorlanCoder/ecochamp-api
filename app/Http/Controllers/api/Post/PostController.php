@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Post;
 
 use App\Enums\Distributed_to;
+use App\Enums\NotificationType;
 use App\Enums\PostType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PostReactionRequest;
@@ -18,6 +19,7 @@ use App\Models\PostMedia;
 use App\Models\PostReaction;
 use App\Models\PostShare;
 use App\Models\Tag;
+use App\Notifications\UserNotification;
 use Illuminate\Http\Request;
 use Illuminate\Log\Logger;
 use Illuminate\Support\Facades\Auth;
@@ -405,10 +407,13 @@ class PostController extends Controller
         ]);
         $post_id = $request->post_id;
         $post = Post::where('id', $post_id)->first();
+
         PostShare::create([
             'post_id' => $post->id,
             'user_id' => $this->user->id,
             ]);
+        
+        $post->user->notify(new UserNotification(NotificationType::Share, 'Votre post a été partagé', $this->user->fullname, $post->id));
 
         return response()->json([
             'status' => 'sucess',
@@ -444,6 +449,8 @@ class PostController extends Controller
             'user_id' => $this->user->id,
             'post_action_id' => $postAction->id,
         ]);
+
+        $postAction->post->user->notify(new UserNotification(NotificationType::Action, 'Un nouveau participant à votre événement.', $this->user->fullname, $postAction->post->id));
 
         return response()->json([
             'status' => 'sucess',
@@ -498,6 +505,7 @@ class PostController extends Controller
                     'remove' => false,
                     'reaction' => $request->reaction,
                 ]);
+                // $postReaction->post->user->notify(new UserNotification(NotificationType::Love, 'Un nouveau réaction à votre post.', $this->user->fullname, $postReaction->post->id));
                 return response()->json([
                     'status' => 'sucess',
                     'message' => 'reaction ajouter avec succes',
@@ -511,6 +519,7 @@ class PostController extends Controller
             'post_id' => $post->id,
             'reaction' => $request->reaction,
         ]);
+        $postReaction->post->user->notify(new UserNotification(NotificationType::Love, 'Un nouveau réaction à votre post.', $this->user->fullname, $postReaction->post->id));
 
         return response()->json([
             'status' => 'sucess',

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\api\Post;
 
+use App\Enums\NotificationType;
 use App\Models\Post;
 
 use Illuminate\Http\Request;
@@ -12,6 +13,7 @@ use App\Http\Requests\CommentRequest;
 use App\Http\Requests\Reaction\AddCommentReactionRequest;
 use App\Models\Comment;
 use App\Models\CommentReaction;
+use App\Notifications\UserNotification;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -54,8 +56,9 @@ class PostCommentsController extends Controller
     public function createComment(CreateCommentRequest $request)
     {
         try {
-            $comment = $this->post->where('id', $request->get('post_id'))->comments->create(['content' => $request->content, 'user_id' => auth()->user()->id]);
-
+            $comment = $this->post->where('id', $request->post_id)->comments->create(['content' => $request->content, 'user_id' => auth()->user()->id]);
+            $comment->post->user->notify(new UserNotification(NotificationType::Love, 'Un nouveau commantaire pour votre post.', auth()->user()->fullname, $request->post_id));
+            
             return response()->json([
                 'success' => true,
                 'data' => $comment,

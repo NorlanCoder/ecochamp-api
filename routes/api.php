@@ -71,6 +71,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('get/reactions', [ReactionController::class, 'getReactions']);
     Route::post('user/posts', [PostController::class, 'getUserPost']);
     
+    Route::get('user/notification', [UserController::class, 'notify_user']);
+    Route::post('user/notification/markasread', [UserController::class,'markAsRead']);
+
     //Conversation controller
     Route::get('conversation/list', [ConversationController::class, 'listConversations']);
     Route::get('conversation/message/list/for', [ConversationController::class, 'getMessageFor']);

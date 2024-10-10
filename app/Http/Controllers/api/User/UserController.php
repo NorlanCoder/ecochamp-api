@@ -238,35 +238,50 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * create account profile
+       /**
+     * Notification Listes user
      */
-    public function createAccount(Request $request)
+    public function notify_user(Request $request)
     {
-        //
+        
+        $user = User::where('id', Auth::user()->id)->first();
+
+        $notifications = $user->notifications;
+        // auth()->user()->unreadNotifications->markAsRead();
+
+        return response()->json([
+            'success' => true,
+            'code' => 200,
+            'message' => 'les notifications',
+            'data' => $notifications
+        ]);
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Notification masquer comme Lu
      */
-    public function edit(string $id)
+    public function markAsRead(Request $request)
     {
-        //
-    }
+        $validator = Validator::make($request->all(), [
+            'id' => ['required'],
+        ]);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ]);
+        }
+        $notification = auth()->user()->unreadNotifications->find($request->id);
+        if ($notification) {
+            $notification->markAsRead();
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return response()->json([
+            'success' => true,
+            'code' => 200,
+            'message' => 'la notification',
+            'data' => $notification
+        ]);
     }
 }
