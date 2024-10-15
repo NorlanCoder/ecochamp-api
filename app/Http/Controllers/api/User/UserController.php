@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\User;
 
+use App\Enums\NotificationType;
 use App\Http\Controllers\Controller;
 use App\Models\CoverPicture;
 use App\Models\Follow;
@@ -12,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -256,6 +258,37 @@ class UserController extends Controller
             'data' => $notifications
         ]);
     }
+
+
+       /**
+     * Define notification Settings
+     */
+    public function notificationSettings(Request $request)
+    {
+        $request->validate([
+            'type' => ['required', Rule::enum(NotificationType::class)],
+            'value' => 'required|boolean',
+        ]);
+        
+        $user = User::where('id', Auth::user()->id)->first();
+
+        $notificationSettings = $user->notificationSettings ? $user->notificationSettings : [
+            'comment' => false,
+            'reaction' => false,
+            'share' => false,
+            'participate' => false
+        ];
+        $notificationSettings[$request->type] = $request->value;
+
+        return response()->json([
+            'success' => true,
+            'code' => 200,
+            'message' => 'notification Settings user',
+            'data' => $user
+        ]);
+    }
+
+
 
     /**
      * Notification masquer comme Lu
