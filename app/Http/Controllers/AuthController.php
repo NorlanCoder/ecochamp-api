@@ -86,7 +86,8 @@ class AuthController extends Controller
             'city' => ['required', 'string', 'max:255'],
             'gender' => ['required', 'string', 'max:255'],
             'password' => ['required', 'min:8', 'max:255'],
-            'email' => ['required', 'email', 'unique:users,email']
+            'email' => ['required', 'email', 'unique:users,email'],
+            'account_type' => 'in:individual,ONG'
         ]);
 
         if ($validator->fails()) {
@@ -100,7 +101,8 @@ class AuthController extends Controller
             'city' => $request->city,
             'gender' => $request->gender,
             'password' => Hash::make($request->password),
-            'email' => $request->email
+            'email' => $request->email,
+            'account_type' => $request->account_type ? $request->account_type : 'individual'
         ]);
 
 

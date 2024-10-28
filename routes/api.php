@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\Post\PostController;
 use App\Http\Controllers\Api\Post\PostTypeController;
 // use App\Http\Controllers\Api\Chat\ConversationController;
 use App\Http\Controllers\Api\Chat\MessageController;
+use App\Http\Controllers\api\FriendRequestController;
 use App\Http\Controllers\api\ReactionController;
 use App\Http\Controllers\Api\User\UserController;
 use Illuminate\Http\Request;
@@ -88,6 +89,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('user/update/profile', 'pictureProfile');
         Route::post('user/update/cover', 'coverProfil');
         Route::put('user/modifie/password', 'modifyPassword');
+    });
+
+    Route::controller(FriendRequestController::class)->group(function () {
+        Route::post('friend/send', 'sendFriendRequest');
+        Route::post('friend/respond', 'respondToFriendRequest');
+        Route::get('friend/pending', 'getFriendRequests');
+        Route::get('friend/list', 'getFriendsList');
     });
 });
 

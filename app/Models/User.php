@@ -47,6 +47,8 @@ class User extends Authenticatable implements JWTSubject
         'gender',
         'password',
         'email',
+        'account_type',
+        'verify',
         'password',
     ];
 
@@ -72,6 +74,17 @@ class User extends Authenticatable implements JWTSubject
             'password' => 'hashed',
         ];
     }
+
+    public function sentFriendRequests()
+    {
+        return $this->hasMany(FriendRequest::class, 'sender_id');
+    }
+
+    public function receivedFriendRequests()
+    {
+        return $this->hasMany(FriendRequest::class, 'receiver_id');
+    }
+
 
     public function posts(): HasMany
     {
