@@ -12,6 +12,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
@@ -249,13 +250,56 @@ class UserController extends Controller
         $user = User::where('id', Auth::user()->id)->first();
 
         $notifications = $user->notifications;
-        // auth()->user()->unreadNotifications->markAsRead();
+
+        $settings = $user->notificationSettings ? json_decode($user->notificationSettings) : [
+            'comment' => true,
+            'reaction' => true,
+            'share' => true,
+            'participate' => true
+        ];
+
+        $filteredNotifications = $notifications->filter(function ($notification) use ($settings) {
+            $type = $notification->data['type'];
+            // Log::info(['type' => $settings->reaction]);
+            if ($type == 'love' && !$settings->reaction) {
+                return false; 
+            }
+            if ($type == $settings->comment . 'ed' && !$settings->comment) {
+                return false; 
+            }
+            if ($type == $settings->share . 'ed' && !$settings->share) {
+                return false; 
+            }
+            if ($type == $settings->participate && !$settings->participate) {
+                return false; 
+            }
+            return true; 
+        });
 
         return response()->json([
             'success' => true,
             'code' => 200,
             'message' => 'les notifications',
-            'data' => $notifications
+            'data' => $filteredNotifications
+        ]);
+    }
+
+
+       /**
+     * Information user
+     */
+    public function infoUser(Request $request)
+    {
+        
+        $user = User::where('id', Auth::user()->id)->first();
+
+        $user->notificationSettings = json_decode($user->notificationSettings);
+
+        return response()->json([
+            'success' => true,
+            'code' => 200,
+            'message' => 'user info',
+            'data' => $user
         ]);
     }
 
@@ -266,25 +310,28 @@ class UserController extends Controller
     public function notificationSettings(Request $request)
     {
         $request->validate([
-            'type' => ['required', Rule::enum(NotificationType::class)],
+            'type' => ['required'],
             'value' => 'required|boolean',
         ]);
         
         $user = User::where('id', Auth::user()->id)->first();
 
-        $notificationSettings = $user->notificationSettings ? $user->notificationSettings : [
-            'comment' => false,
-            'reaction' => false,
-            'share' => false,
-            'participate' => false
+        $notificationSettings = $user->notificationSettings ? json_decode($user->notificationSettings, true) : [
+            'comment' => true,
+            'reaction' => true,
+            'share' => true,
+            'participate' => true
         ];
+        
         $notificationSettings[$request->type] = $request->value;
+        $user->notificationSettings = json_encode($notificationSettings);
+        $user->save();
 
         return response()->json([
             'success' => true,
             'code' => 200,
             'message' => 'notification Settings user',
-            'data' => $user
+            'data' => $notificationSettings
         ]);
     }
 
