@@ -20,7 +20,9 @@ class FriendRequestController extends Controller
             'receiverId' => 'required'
         ]);
 
-        if (FriendRequest::where('sender_id', auth()->id())->where('receiver_id', $request->receiverId)->exists()) 
+        $verify = FriendRequest::where('sender_id', auth()->id())->where('receiver_id', $request->receiverId)->exists()
+                    || FriendRequest::where('receiver_id', auth()->id())->where('sender_id', $request->receiverId)->exists();
+        if ($verify) 
         {
             return response()->json(
                 [
@@ -79,7 +81,9 @@ class FriendRequestController extends Controller
     public function getFriendRequests()
     {
         $user = User::where('id', Auth::user()->id)->first();
-        $requests = $user->receivedFriendRequests()->where('status', 'pending')->get();
+        $requests = $user->receivedFriendRequests()->where('status', 'pending')
+        ->with('sender')
+        ->with('receiver')->get();
         return response()->json(
             [
                 'success' => true,
@@ -95,8 +99,20 @@ class FriendRequestController extends Controller
     public function getFriendsList()
     {
         $friends = FriendRequest::where(function($query) {
-            $query->where('sender_id', auth()->id())->orWhere('receiver_id', auth()->id());
-        })->where('status', 'accepted')->get();
+            $query->where('sender_id', auth()->id())
+                  ->orWhere('receiver_id', auth()->id())
+        ->distinct()
+        ;
+        })
+        ->where('status', 'accepted')
+        ->with(['sender', 'receiver'])
+        ->distinct()
+        ->get()
+        ->map(function($friendRequest) {
+            return $friendRequest->sender_id == auth()->id() 
+                ? $friendRequest->receiver 
+                : $friendRequest->sender;
+        });
 
         return response()->json(
             [
@@ -104,6 +120,39 @@ class FriendRequestController extends Controller
                 'code' => 200,
                 'message' => 'liste des amis',
                 'data' => $friends
+            ]);
+    }
+
+     /**
+     * Liste sugestion  d'amis 
+     */
+    public function getSuggestion()
+    {
+        $friend_ids = FriendRequest::where(function($query) {
+                $query->where('sender_id', auth()->id())
+                    ->orWhere('receiver_id', auth()->id());
+            })
+            ->where('status', 'accepted')
+            ->pluck('sender_id', 'receiver_id')
+            ->flatten()
+            ->unique()
+            ->toArray();
+        
+        $suggfriends = User::where(function($query) {
+                $query->where('country', 'like', '%' . Auth::user()->country . '%')
+                    ->orWhere('city', 'like', '%' . Auth::user()->city . '%');
+            })
+            ->whereNotIn('id', $friend_ids)
+            ->where('id', '!=', auth()->id()) 
+            ->get();
+    
+
+        return response()->json(
+            [
+                'success' => true,
+                'code' => 200,
+                'message' => 'liste des amis',
+                'data' => $suggfriends
             ]);
     }
 

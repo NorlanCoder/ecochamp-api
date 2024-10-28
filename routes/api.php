@@ -96,6 +96,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('friend/respond', 'respondToFriendRequest');
         Route::get('friend/pending', 'getFriendRequests');
         Route::get('friend/list', 'getFriendsList');
+        Route::get('friend/suggestion', 'getSuggestion');
     });
 });
 
