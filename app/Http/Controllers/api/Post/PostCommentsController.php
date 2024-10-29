@@ -34,14 +34,11 @@ class PostCommentsController extends Controller
      */
     public function getPostComments(Request $request)
     {
-        $validator = Validator::make([
+        $request->validate([
             'post_id' => ['required', 'integer', 'exists:posts,id']
         ]);
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
-
+    
         $comments = Comment::where('post_id', $request->get('post_id'))->with('post:id,title')->orderBy('created_at', 'desc')->paginate(10);
 
         return response()->json([
@@ -56,17 +53,36 @@ class PostCommentsController extends Controller
     public function createComment(CreateCommentRequest $request)
     {
         try {
-            $comment = $this->post->where('id', $request->post_id)->comments->create(['content' => $request->content, 'user_id' => auth()->user()->id]);
-            $comment->post->user->notify(new UserNotification(NotificationType::Love, 'Un nouveau commantaire pour votre post.', auth()->user()->fullname, $request->post_id));
+            $post = $this->post->find($request->post_id);
             
+            if (!$post) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Post not found',
+                ], 404);
+            }
+        
+            $comment = $post->comments()->create([
+                'content' => $request->content,
+                'user_id' => auth()->user()->id,
+            ]);
+        
+            $post->user->notify(new UserNotification(
+                NotificationType::Love,
+                'Un nouveau commentaire pour votre post.',
+                auth()->user()->fullname,
+                $request->post_id
+            ));
+        
             return response()->json([
                 'success' => true,
                 'data' => $comment,
-                'message' => 'comment created successfully',
+                'message' => 'Comment created successfully',
             ], 201);
         } catch (ValidationException $e) {
             return response()->json(['errors' => $e->errors()], 422);
         }
+        
     }
 
     public function updateComment(UpdateCommentRequest $request)

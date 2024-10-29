@@ -10,6 +10,7 @@ use App\Http\Requests\PostReactionRequest;
 use App\Http\Requests\PostRequest;
 use App\Http\Requests\PostUpdateRequest;
 use App\Models\Follow;
+use App\Models\FriendRequest;
 use App\Models\Media;
 use App\Models\Post;
 use App\Models\User;
@@ -38,31 +39,66 @@ class PostController extends Controller
 
     
     /**
-     * getUserPost
+     * getUserPost:: Envoi d'id de l'utilisateur 'user_id'
      */
-    public function getUserPost(Request $request)
-    {
-        if($request->user_id){
-            $this->user = User::where('id', $request->user_id)->first();
-        }else{
-            $this->user = Auth::user();
-        }
-        if($this->user){
-           
-            $post = Post::where('user_id', $this->user->id)
+    public function getUserPost(Request $request) {
+        $request->validate([
+            'user_id' => 'integer|exists:users,id',
+        ]);
+    
+        // Récupération de l'utilisateur
+        $this->user = $request->user_id ? User::findOrFail($request->user_id) : Auth::user();
+    
+        if ($this->user) {
+            // Récupération des posts
+            $post_count = Post::where('user_id', $this->user->id)
+                ->count();
+                
+            $action_count = 0;
+
+            $posts = Post::where('user_id', $this->user->id)
+                ->with([ 'comments', 'postReactionsWithoutRemove', 'tags'])
                 ->orderByDesc('created_at')
-                ->with('postMedias')
-            ->with('postReactionsWithoutRemove')
-            ->with('tags')->orderByDesc('created_at')->paginate(20);
-        }
+                ->paginate(10);
+            
+            // Récupération de l'état de la demande d'amis
+            $friendRequest = FriendRequest::where(function($query) {
+                $query->where('sender_id', auth()->id())
+                      ->orWhere('receiver_id', auth()->id());
+            })->where(function($query) {
+                $query->where('sender_id', $this->user->id)
+                      ->orWhere('receiver_id', $this->user->id);
+            })->first();
+
+            $this->user->friend_status = $friendRequest ? $friendRequest->status : null;
         
+    
+            // Transformation des posts pour ajouter les images
+            $posts->getCollection()->transform(function($query) {
+                $images = PostMedia::where('post_id', $query->id)
+                    ->with('media')
+                    ->get()
+                    ->map(function ($postMedia) {
+                        return $postMedia->media->url_media;
+                    });
+    
+                $query->images = $images;
+                return $query;
+            });
+    
+        }
+    
         return response()->json([
-            'status' => 'sucess',
-            'message' => 'post list user connect',
+            'status' => 'success',
+            'message' => 'Post list retrieved successfully.',
             'code' => 200,
-            'data' => $post,
-        ]); 
+            'user' => $this->user,
+            'post_count' => $post_count,
+            'action_count' => $action_count,
+            'data' => $posts,
+        ]);
     }
+    
 
     /**
      * get Posts User
@@ -70,10 +106,11 @@ class PostController extends Controller
     public function getPostsUser(Request $request)
     {
         $this->user = Auth::user();
+
         if($this->user){
             $post = Post::where('type', PostType::Post)
                 ->where('user_id', $this->user->id)
-                    ->with('user')
+                // ->with('user')
                 ->with('user')
                 ->with('comments')
                 // ->with('postReactions')

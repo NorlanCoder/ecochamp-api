@@ -114,6 +114,22 @@ class FriendRequestController extends Controller
                 : $friendRequest->sender;
         });
 
+        $friends = $friends->transform(function($user) { 
+            $friendRequest = FriendRequest::where(function($query) use ($user) {
+                                $query->where('sender_id', auth()->id())
+                                    ->where('receiver_id', $user->id);
+                            })
+                            ->orWhere(function($query) use ($user) {
+                                $query->where('receiver_id', auth()->id())
+                                    ->where('sender_id', $user->id);
+                            })
+                            ->first();
+
+            $user->friend_status = $friendRequest ? $friendRequest->status : null;
+
+            return $user;
+        });
+
         return response()->json(
             [
                 'success' => true,
@@ -129,22 +145,42 @@ class FriendRequestController extends Controller
     public function getSuggestion()
     {
         $friend_ids = FriendRequest::where(function($query) {
-                $query->where('sender_id', auth()->id())
-                    ->orWhere('receiver_id', auth()->id());
+            $query->where('sender_id', auth()->id())
+                  ->orWhere('receiver_id', auth()->id());
             })
-            ->where('status', 'accepted')
-            ->pluck('sender_id', 'receiver_id')
-            ->flatten()
+            ->whereIn('status', ['accepted', 'pending']) // Utilise whereIn pour les deux statuts
+            ->get(['sender_id', 'receiver_id']) // Récupère les deux colonnes en même temps
+            ->flatMap(function ($request) { 
+                return [$request->sender_id, $request->receiver_id];
+            })
             ->unique()
             ->toArray();
+
         
-        $suggfriends = User::where(function($query) {
-                $query->where('country', 'like', '%' . Auth::user()->country . '%')
-                    ->orWhere('city', 'like', '%' . Auth::user()->city . '%');
-            })
-            ->whereNotIn('id', $friend_ids)
-            ->where('id', '!=', auth()->id()) 
-            ->get();
+            $suggfriends = User::where(function($query) {
+                        $query->where('country', 'like', '%' . Auth::user()->country . '%')
+                            ->orWhere('city', 'like', '%' . Auth::user()->city . '%');
+                    })
+                    ->whereNotIn('id', $friend_ids)
+                    ->where('id', '!=', auth()->id())
+                    ->get();
+
+            $suggfriends = $suggfriends->transform(function($user) { 
+                    $friendRequest = FriendRequest::where(function($query) use ($user) {
+                                        $query->where('sender_id', auth()->id())
+                                            ->where('receiver_id', $user->id);
+                                    })
+                                    ->orWhere(function($query) use ($user) {
+                                        $query->where('receiver_id', auth()->id())
+                                            ->where('sender_id', $user->id);
+                                    })
+                                    ->first();
+
+                    $user->friend_status = $friendRequest ? $friendRequest->status : null;
+
+                    return $user;
+                });
+
     
 
         return response()->json(
