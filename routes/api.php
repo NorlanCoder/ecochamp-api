@@ -77,11 +77,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('user/notification/settings', [UserController::class,'notificationSettings']);
     Route::get('user/info', [UserController::class,'infoUser']);
     
-    //Conversation controller
-    Route::get('conversation/list', [ConversationController::class, 'listConversations']);
-    Route::get('conversation/message/list/for', [ConversationController::class, 'getMessageFor']);
-    Route::post('conversation/message/send', [ConversationController::class, 'sendMessage']);
-
     Route::controller(UserController::class)->group(function () {
         // Route::put('notification/token/refresh', 'refresh_token_notify');
         // Route::get('notifications', 'notifications');
@@ -98,6 +93,17 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('friend/list', 'getFriendsList');
         Route::get('friend/suggestion', 'getSuggestion');
     });
+
+    Route::controller(ConversationController::class)->group(function () {
+        Route::post('chat/create', 'createChat');
+        Route::post('chat/message/create', 'sendMessage');
+        Route::get('chat/list', 'listConversations');
+        Route::post('chat/message/list', 'getMessageFor');
+        Route::post('chat/verify', 'chatExist');
+        Route::post('chat/read/message', 'readMessage');
+        
+    });
+
 });
 
 Route::post('reaction/create', [ReactionController::class, 'createReaction']);

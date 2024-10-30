@@ -9,14 +9,23 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Message extends Model
 {
     use HasFactory;
+
     protected $fillable =
     [
+        'friend_request_id',
         'from_id',
         'to_id',
+        'read_at',
+        'is_delete',
         'content'
     ];
 
     public function from(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function to(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
