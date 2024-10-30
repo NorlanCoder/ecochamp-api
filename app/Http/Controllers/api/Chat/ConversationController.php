@@ -110,12 +110,12 @@ class ConversationController extends Controller
         ]);
 
         $chat = Chat::where(function($query) use ($user, $request) {
-                    $query->where('createby_id', $user->id)
-                        ->where('createfor_id', $request->to_id);
+                    $query->where('sender_id', $user->id)
+                        ->where('receiver_id', $request->to_id);
                 })
                 ->orWhere(function($query) use ($user, $request) {
-                    $query->where('createby_id', $request->to_id)
-                        ->where('createfor_id', $user->id);
+                    $query->where('sender_id', $request->to_id)
+                        ->where('receiver_id', $user->id);
                 })
                 ->first();
         

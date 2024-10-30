@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Models\chat;
 use App\Models\FriendRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -62,6 +63,10 @@ class FriendRequestController extends Controller
 
         if ($action == 'accept') {
             $friendRequest->status = 'accepted';
+            $chat = chat::create([
+                'sender_id' => $friendRequest->sender_id,
+                'receiver_id' => $friendRequest->receiver_id,
+            ]);
         } elseif ($action == 'decline') {
             $friendRequest->status = 'declined';
         }
