@@ -87,8 +87,10 @@ class FriendRequestController extends Controller
     {
         $user = User::where('id', Auth::user()->id)->first();
         $requests = $user->receivedFriendRequests()->where('status', 'pending')
-        ->with('sender')
-        ->with('receiver')->get();
+            ->with('sender')
+            ->with('receiver')
+            ->orderByFullname('Asc')
+            ->get();
         return response()->json(
             [
                 'success' => true,

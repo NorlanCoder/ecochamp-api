@@ -138,6 +138,7 @@ class ConversationController extends Controller
             $query->where('sender_id', auth()->id())
                   ->orWhere('receiver_id', auth()->id());
                 })
+                ->orderBy('id','desc')
                 ->get();
             
         $listchat->transform(function($query) use ($user){
@@ -209,7 +210,8 @@ class ConversationController extends Controller
                     ->where(function ($query) use ($user) {
                         $query->where('from_id', $user->id)
                         ->orWhere('to_id', $user->id);
-                    })->get();
+                    })
+                    ->get();
         $listmessage->transform(function($query){
 
             $query->from = User::where('id', $query->from_id)->first();
@@ -247,7 +249,7 @@ class ConversationController extends Controller
             'status' => 'success',
             'message' => 'get message for',
             'code' => 200,
-            'data' => null,
+            'data' => $listmessage,
         ]); 
     }
 
