@@ -11,7 +11,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
-class NewMessage implements ShouldBroadcast
+class Discussion implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -20,27 +20,26 @@ class NewMessage implements ShouldBroadcast
      *
      * @var mixed
      */
-    public $message;
+    public $chat;
+
 
     /**
      * Create a new event instance.
      */
-    public function __construct($message)
+    public function __construct($chat)
     {
-        $this->message = $message;
+        $this->chat = $chat;
     }
 
     /**
      * Get the channels the event should broadcast on.
      *
      * @return \Illuminate\Broadcasting\Channel|array
-     * 
      */
     public function broadcastOn(): Channel
     {
-        Log::info('ici');
-
-        return new Channel('chats.'. $this->message['chat_id']);
+       
+        return new Channel('discussions.'. $this->chat['to_id']);
     }
 
     /**
@@ -51,7 +50,7 @@ class NewMessage implements ShouldBroadcast
     public function broadcastWith()
     {
         return [
-            'message' => $this->message,
+            'message' => $this->chat,
         ];
     }
 }

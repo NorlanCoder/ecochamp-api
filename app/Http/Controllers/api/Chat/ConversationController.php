@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\api\Chat;
 
+use App\Events\Discussion;
 use App\Events\NewMessage;
+use App\Events\ReadMessage;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Chat\StoreMessageRequest;
 use App\Models\Chat;
@@ -70,7 +72,7 @@ class ConversationController extends Controller
                                 ->count(),
                 ];
             
-            // event(new Discussion($tab_chat));
+            event(new Discussion($tab_chat));
 
             return response()->json([
                 'success' => true,
@@ -185,7 +187,35 @@ class ConversationController extends Controller
             'chat_id' => $chat->id
         ]);
 
-        // event(new NewMessage($message));
+        $tab_meg = [
+            'id' => $message->id,
+            'chat_id' => $message->chat_id,
+            'from_id' => $message->from_id,
+            'from' => User::where('id', $message->from_id)->first(),
+            'to_id' => $request->to_id,
+            'to' => User::where('id', $request->to_id)->first(),
+            'content' => $message->content,
+            'read_at' => $message->read_at,
+            'created_at' => $message->created_at,
+            'updated_at' => $message->updated_at
+        ];
+
+        event(new NewMessage($tab_meg));
+
+        $tab_chat = [
+            'id' => $chat->id,
+            'from_id' => $message->from_id,
+            'to_id' => $message->to_id,
+            'from' => User::where('id', $message->from_id)->first(),
+            'to' =>  User::where('id', $message->to_id)->first(),
+            'lastmessage' => Message::where('chat_id', $chat->id)->orderBy('id','desc')->limit(1)->get(),
+            'count_message' => Message::where('chat_id', $chat->id)
+                        ->where('to_id', $request->to_id)
+                        ->where('read_at', null)
+                        ->count(),
+        ];
+    
+        event(new Discussion($tab_chat));
 
         return response()->json([
             'status' => 'success',
@@ -242,7 +272,7 @@ class ConversationController extends Controller
                 'updated_at' => $item->updated_at
             ];
             
-            // event(new ReadMessage($tab_meg));
+            event(new ReadMessage($tab_meg));
         }            
 
         return response()->json([
@@ -279,7 +309,7 @@ class ConversationController extends Controller
                 'created_at' => $message->created_at,
                 'updated_at' => $message->updated_at
             ];
-            // event(new ReadMessage($tab_meg));
+            event(new ReadMessage($tab_meg));
         }
     }
 }
