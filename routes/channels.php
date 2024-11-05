@@ -20,3 +20,8 @@ Broadcast::channel('discussions.{id}', function ($user, $id) {
 Broadcast::channel('messages.{id}', function ($user, $id) {
     return true;
 });
+
+
+Broadcast::channel('onligne.{id}', function ($user, $id) {
+    return (int) $user->id === (int) $id;
+});

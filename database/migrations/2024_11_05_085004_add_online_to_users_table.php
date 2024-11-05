@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::table('users', function (Blueprint $table) {
+            $table->timestamp('online')->nullable();
+        });
+
         Schema::table('messages', function (Blueprint $table) {
-            $table->foreignId('chat_id')->constrained('chats')->onDelete('cascade');
-            $table->timestamp('read_at')->nullable(); 
-            $table->boolean('is_delete')->default(false); 
+            $table->json('images')->nullable();
         });
     }
 
@@ -23,10 +25,11 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropIfExists('online');
+        });
         Schema::table('messages', function (Blueprint $table) {
-            $table->dropIfExists('chat_id');
-            $table->dropIfExists('read_at');
-            $table->dropIfExists('is_delete');
+            $table->dropIfExists('images');
         });
     }
 };
