@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 use App\Events\UserOnligne;
-
+use App\Models\User;
 
 class UpdateUserOnline
 {
@@ -19,7 +19,8 @@ class UpdateUserOnline
     public function handle($request, Closure $next)
     {
         if (Auth::check()) {
-            auth()->user()->update(['online' => now()]);
+            $user = User::where('id', auth()->user()->id)->first();
+            $user->update(['online' => now()]);
 
             event(new UserOnligne(Auth::user()));
         }

@@ -50,6 +50,7 @@ class User extends Authenticatable implements JWTSubject
         'account_type',
         'verify',
         'password',
+        'online',
     ];
 
     /**

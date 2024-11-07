@@ -255,7 +255,8 @@ class UserController extends Controller
             'comment' => true,
             'reaction' => true,
             'share' => true,
-            'participate' => true
+            'participate' => true,
+            'message' => true
         ];
 
         $filteredNotifications = $notifications->filter(function ($notification) use ($settings) {
@@ -271,6 +272,9 @@ class UserController extends Controller
                 return false; 
             }
             if ($type == $settings->participate && !$settings->participate) {
+                return false; 
+            }
+            if ($type == $settings->message && !$settings->message) {
                 return false; 
             }
             return true; 
