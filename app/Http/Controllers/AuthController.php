@@ -84,10 +84,13 @@ class AuthController extends Controller
             'phone_number' => ['required', 'max:255', 'regex:/^[\+]?[(]?[0-9 ]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/', 'unique:users,phone_number'],
             'country' => ['required', 'string', 'max:255'],
             'city' => ['required', 'string', 'max:255'],
-            'gender' => ['required', 'string', 'max:255'],
+            'gender' => ['string', 'max:255'],
             'password' => ['required', 'min:8', 'max:255'],
             'email' => ['required', 'email', 'unique:users,email'],
-            'account_type' => 'in:individual,ONG'
+            'account_type' => 'in:individual,ONG',
+            'ifu' => 'string',
+            'rccm' => 'string',
+            'address' => 'string',
         ]);
 
         if ($validator->fails()) {
@@ -99,10 +102,13 @@ class AuthController extends Controller
             'phone_number' => $request->phone_number,
             'country' => $request->country,
             'city' => $request->city,
-            'gender' => $request->gender,
+            'gender' => $request->gender  ? $request->gender : null,
             'password' => Hash::make($request->password),
             'email' => $request->email,
-            'account_type' => $request->account_type ? $request->account_type : 'individual'
+            'account_type' => $request->account_type ? $request->account_type : 'individual',
+            'ifu' => $request->ifu ? $request->ifu : null,
+            'rccm' => $request->rccm ? $request->rccm : null,
+            'address' => $request->rccm ? $request->rccm : null,
         ]);
 
 

@@ -45,6 +45,7 @@ Route::get('post', [PostController::class, 'getPost']);
 Route::get('get/alerte', [PostController::class, 'getAllAlerte']);
 Route::get('get/post', [PostController::class, 'getAllPost']);
 Route::get('get/evennement', [PostController::class, 'getAllEvennement']);
+Route::get('get/city', [UserController::class, 'getCity']);
 
 Route::middleware(['auth:sanctum', 'online'])->group(function () {
     Route::get('user/posts', [PostController::class, 'getPostsUser']);

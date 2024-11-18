@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\User;
 
 use App\Enums\NotificationType;
 use App\Http\Controllers\Controller;
+use App\Models\Country;
 use App\Models\CoverPicture;
 use App\Models\Follow;
 use App\Models\Media;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+
 
 class UserController extends Controller
 {
@@ -368,4 +370,25 @@ class UserController extends Controller
             'data' => $notification
         ]);
     }
+
+    /**
+     * Liste des Villes du benin
+     */
+    public function getCity(Request $request)
+    {
+        $country = Country::where('name', 'benin')->first();
+        
+        $cities = $country->states()->with('cities')
+            ->orderby('name', 'desc')->get()->pluck('cities')->flatten();
+        
+        return response()->json([
+            'success' => true,
+            'code' => 200,
+            'message' => 'ville',
+            'data' => $cities
+        ]);
+    }
+
 }
+
+

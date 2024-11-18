@@ -51,6 +51,9 @@ class User extends Authenticatable implements JWTSubject
         'verify',
         'password',
         'online',
+        'ifu',
+        'rccm',
+        'address'
     ];
 
     /**

@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->timestamp('online')->nullable();
+            $table->string('ifu')->nullable();
+            $table->string('rccm')->nullable();
+            $table->string('address')->nullable();
+        
         });
 
         Schema::table('messages', function (Blueprint $table) {
@@ -27,6 +31,9 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->dropIfExists('online');
+            $table->dropIfExists('ifu');
+            $table->dropIfExists('rccm');
+            $table->dropIfExists('address');
         });
         Schema::table('messages', function (Blueprint $table) {
             $table->dropIfExists('images');
