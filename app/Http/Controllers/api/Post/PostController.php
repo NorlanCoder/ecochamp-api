@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\PostReactionRequest;
 use App\Http\Requests\PostRequest;
 use App\Http\Requests\PostUpdateRequest;
+use App\Models\Action;
 use App\Models\Follow;
 use App\Models\FriendRequest;
 use App\Models\Media;
@@ -21,6 +22,7 @@ use App\Models\PostReaction;
 use App\Models\PostShare;
 use App\Models\Tag;
 use App\Notifications\UserNotification;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Http\Request;
 use Illuminate\Log\Logger;
 use Illuminate\Support\Facades\Auth;
@@ -37,7 +39,7 @@ class PostController extends Controller
         $this->user = Auth::user();
     }
 
-    
+
     /**
      * getUserPost:: Envoi d'id de l'utilisateur 'user_id'
      */
@@ -45,22 +47,22 @@ class PostController extends Controller
         $request->validate([
             'user_id' => 'integer|exists:users,id',
         ]);
-    
+
         // Récupération de l'utilisateur
         $this->user = $request->user_id ? User::findOrFail($request->user_id) : Auth::user();
-    
+
         if ($this->user) {
             // Récupération des posts
             $post_count = Post::where('user_id', $this->user->id)
                 ->count();
-                
+
             $action_count = 0;
 
             $posts = Post::where('user_id', $this->user->id)
                 ->with([ 'comments', 'postReactionsWithoutRemove', 'tags'])
                 ->orderByDesc('created_at')
                 ->paginate(10);
-            
+
             // Récupération de l'état de la demande d'amis
             $friendRequest = FriendRequest::where(function($query) {
                 $query->where('sender_id', auth()->id())
@@ -71,8 +73,8 @@ class PostController extends Controller
             })->first();
 
             $this->user->friend_status = $friendRequest ? $friendRequest->status : null;
-        
-    
+
+
             // Transformation des posts pour ajouter les images
             $posts->getCollection()->transform(function($query) {
                 $images = PostMedia::where('post_id', $query->id)
@@ -81,13 +83,13 @@ class PostController extends Controller
                     ->map(function ($postMedia) {
                         return $postMedia->media->url_media;
                     });
-    
+
                 $query->images = $images;
                 return $query;
             });
-    
+
         }
-    
+
         return response()->json([
             'status' => 'success',
             'message' => 'Post list retrieved successfully.',
@@ -98,7 +100,7 @@ class PostController extends Controller
             'data' => $posts,
         ]);
     }
-    
+
 
     /**
      * get Posts User
@@ -116,7 +118,7 @@ class PostController extends Controller
                 // ->with('postReactions')
                 ->with('postReactionsWithoutRemove')
                 ->orderByDesc('created_at')->paginate(20);
-            
+
             $post->getCollection()->transform(function($query) {
                 $images = PostMedia::where('post_id', $query->id)
                         ->with('media')
@@ -124,20 +126,20 @@ class PostController extends Controller
                         ->map(function ($postMedia) {
                             return $postMedia->media->url_media;
                         });
-            
+
                 $query->images = $images;
-            
+
                 return $query;
             });
-               
+
             return response()->json([
                 'status' => 'sucess',
                 'message' => 'post list user connect all plateforme',
                 'code' => 200,
                 'data' => $post,
-            ]); 
+            ]);
         }
-        
+
     }
 
 
@@ -157,7 +159,7 @@ class PostController extends Controller
                 // ->with('postReactions')
                 ->with('postReactionsWithoutRemove')
                 ->orderByDesc('created_at')->paginate(20);
-            
+
             $post->getCollection()->transform(function($query) {
                 $images = PostMedia::where('post_id', $query->id)
                         ->with('media')
@@ -165,9 +167,9 @@ class PostController extends Controller
                         ->map(function ($postMedia) {
                             return $postMedia->media->url_media;
                         });
-            
+
                 $query->images = $images;
-            
+
                 return $query;
             });
 
@@ -176,10 +178,10 @@ class PostController extends Controller
                 'message' => 'post list user connect all plateforme',
                 'code' => 200,
                 'data' => $post,
-            ]); 
-                
+            ]);
+
         }
-        
+
     }
 
 
@@ -204,20 +206,20 @@ class PostController extends Controller
                     });
             // $postReactions = PostReaction::where('post_id', $query->id)
             // ->where('remove', false)->get();
-            
+
             $query->images = $images;
             // $query->post_reactions = $postReactions;
-        
+
             return $query;
         });
-        
+
 
         return response()->json([
             'status' => 'sucess',
             'message' => 'Alerte',
             'code' => 200,
             'data' => $post,
-        ]); 
+        ]);
     }
 
     /**
@@ -227,7 +229,7 @@ class PostController extends Controller
     {
         $this->user = Auth::user();
         if($this->user){
-            
+
             $post = Post::where('type', PostType::Alerte)
                 ->where('user_id', $this->user->id)
                     ->with('user')
@@ -236,7 +238,7 @@ class PostController extends Controller
                 // ->with('postReactions')
                 ->with('postReactionsWithoutRemove')
                 ->orderByDesc('created_at')->paginate(20);
-            
+
             $post->getCollection()->transform(function($query) {
                 $images = PostMedia::where('post_id', $query->id)
                         ->with('media')
@@ -246,12 +248,12 @@ class PostController extends Controller
                         });
                     // $postReactions = PostReaction::where('post_id', $query->id)
                     // ->where('remove', false)->get();
-                    
+
                     $query->images = $images;
                     // $query->post_reactions = $postReactions;
-            
+
                 $query->images = $images;
-            
+
                 return $query;
             });
 
@@ -260,9 +262,9 @@ class PostController extends Controller
                 'message' => 'post list user connect all plateforme',
                 'code' => 200,
                 'data' => $post,
-            ]); 
+            ]);
         }
-        
+
     }
 
     /**
@@ -274,6 +276,7 @@ class PostController extends Controller
         ->with('user')
         ->with('comments')
         ->with('tags')
+        ->with('postActions')
         ->with('postReactionsWithoutRemove')
         ->orderByDesc('created_at')->paginate(20);
 
@@ -286,20 +289,20 @@ class PostController extends Controller
                     });
             // $postReactions = PostReaction::where('post_id', $query->id)
             // ->where('remove', false)->get();
-            
+
             $query->images = $images;
             // $query->post_reactions = $postReactions;
-        
+
             return $query;
         });
-        
+
 
         return response()->json([
             'status' => 'sucess',
-            'message' => 'Alerte',
+            'message' => 'Evènement',
             'code' => 200,
             'data' => $post,
-        ]); 
+        ]);
     }
 
 
@@ -324,20 +327,73 @@ class PostController extends Controller
                     });
             // $postReactions = PostReaction::where('post_id', $query->id)
             // ->where('remove', false)->get();
-            
+
             $query->images = $images;
             // $query->post_reactions = $postReactions;
-        
+
             return $query;
         });
-        
+
 
         return response()->json([
             'status' => 'sucess',
-            'message' => 'Alerte',
+            'message' => 'Post',
             'code' => 200,
             'data' => $post,
-        ]); 
+        ]);
+    }
+
+    /**
+     *  Post Financement Lists
+     */
+    public function getAllPostFinancement() {
+
+        $post = Post::where('type', PostType::Evennement)
+        ->with('user')
+        ->with('comments')
+        ->with('tags')
+        ->with('postReactionsWithoutRemove')
+        ->with(['postActions' => function (BelongsToMany $query) {
+            $query->where('label', 'Financement'); // Replace 'SpecificLabel' with the desired label
+        }])
+        ->orderByDesc('created_at')->paginate(20);
+
+        $post->getCollection()->transform(function($query) {
+            $images = PostMedia::where('post_id', $query->id)
+                    ->with('media')
+                    ->get()
+                    ->map(function ($postMedia) {
+                        return $postMedia->media->url_media;
+                    });
+            // $postReactions = PostReaction::where('post_id', $query->id)
+            // ->where('remove', false)->get();
+
+            $query->images = $images;
+            // $query->post_reactions = $postReactions;
+
+            return $query;
+        });
+
+
+        return response()->json([
+            'status' => 'sucess',
+            'message' => 'Post',
+            'code' => 200,
+            'data' => $post,
+        ]);
+    }
+
+    /**
+     * Get Action
+     */
+    public function getAction() {
+        $actions = Action::all();
+
+        return response()->json([
+            'status' => 'sucess',
+            'code' => 200,
+            'data' => $actions,
+        ]);
     }
 
     /**
@@ -360,14 +416,14 @@ class PostController extends Controller
                 'message' => 'post n\'exist pas',
                 'code' => '404',
                 'data' => null,
-            ]); 
+            ]);
         }
         return response()->json([
             'status' => 'sucess',
             'message' => 'post get',
             'code' => 200,
             'data' => $post,
-        ]); 
+        ]);
     }
 
     /**
@@ -401,7 +457,7 @@ class PostController extends Controller
             }
         }
         if($request->medias){
-                    
+
             foreach ($request->medias as $image) {
                 $img = time() . '-' . $image->getClientOriginalName();
                 $path = $image->move(public_path('post'), $img);
@@ -417,7 +473,7 @@ class PostController extends Controller
             }
         }
         if($request->actions){
-                    
+
             foreach ($request->actions as $action) {
                 $post_action = PostAction::create([
                     'post_id' => $post->id,
@@ -430,8 +486,8 @@ class PostController extends Controller
             'message' => 'post create',
             'code' => 200,
             'data' => $post,
-        ]); 
-        
+        ]);
+
     }
 
     /**
@@ -449,7 +505,7 @@ class PostController extends Controller
             'post_id' => $post->id,
             'user_id' => $this->user->id,
             ]);
-        
+
         $post->user->notify(new UserNotification(NotificationType::Share, 'Votre post a été partagé', $this->user->fullname, $post->id));
 
         return response()->json([
@@ -514,7 +570,7 @@ class PostController extends Controller
         }
         $postReaction = PostReaction::where('user_id',  $this->user->id)
             ->where('post_id', $post->id)->first();
-        
+
         // if(!$postReaction) {
 
         //     $postReaction = PostReaction::create([
@@ -567,7 +623,7 @@ class PostController extends Controller
     }
 
     /**
-     * delete reaction post 
+     * delete reaction post
      */
     public function deleteReaction(Request $request)
     {
@@ -584,7 +640,7 @@ class PostController extends Controller
                 'message' => 'postReaction n\'exist pas',
                 'code' => '404',
                 'data' => null,
-            ]); 
+            ]);
         }
         $postReaction->delete();
         return response()->json([
@@ -592,7 +648,7 @@ class PostController extends Controller
             'message' => 'postReaction delete',
             'code' => 200,
             'data' => null,
-        ]); 
+        ]);
     }
 
     /**
@@ -618,7 +674,7 @@ class PostController extends Controller
                 'message' => 'post n\'exist pas',
                 'code' => '404',
                 'data' => null,
-            ]); 
+            ]);
         }
         $post->upadte([
             'user_id'       => $this->user->id,
@@ -636,7 +692,7 @@ class PostController extends Controller
         PostAction::where('post_id', $post->id)->delete();
 
         if($request->actions){
-                    
+
             foreach ($request->actions as $action) {
                 $post_action = PostAction::create([
                     'post_id' => $post->id,
@@ -659,7 +715,7 @@ class PostController extends Controller
         PostMedia::where('post_id', $post->id)->delete();
 
         if($request->medias){
-                    
+
             foreach ($request->images as $image) {
                 $img = time() . $image->getClientOriginalName();
                 $path = $image->move(public_path() . "\post", $img);
@@ -678,7 +734,7 @@ class PostController extends Controller
             'message' => 'post mise à jour',
             'code' => 200,
             'data' => $post,
-        ]); 
+        ]);
     }
 
     /**
@@ -699,7 +755,7 @@ class PostController extends Controller
                 'message' => 'post n\'exist pas',
                 'code' => '404',
                 'data' => null,
-            ]); 
+            ]);
         }
         $post->delete();
         return response()->json([
@@ -707,7 +763,7 @@ class PostController extends Controller
             'message' => 'post delete',
             'code' => 200,
             'data' => null,
-        ]); 
+        ]);
     }
 }
 
@@ -721,7 +777,7 @@ class PostController extends Controller
             //     ->orWhere('city', $this->user->city)
                 // ->OrwhereIn(
                 //     function($query) use($id_follows){
-                //         $query->whereIn('user_id', $id_follows); 
+                //         $query->whereIn('user_id', $id_follows);
                 //     })
 
 // else{
@@ -748,12 +804,12 @@ class PostController extends Controller
         //                 ->map(function ($postMedia) {
         //                     return $postMedia->media->url_media;
         //                 });
-            
+
         //         $query->images = $images;
-            
+
         //         return $query;
         //     });
         //     }
-            
+
         // }
         // return $this->getPost();

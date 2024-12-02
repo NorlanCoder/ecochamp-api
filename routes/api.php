@@ -43,7 +43,9 @@ Route::group([
 
 Route::get('post', [PostController::class, 'getPost']);
 Route::get('get/alerte', [PostController::class, 'getAllAlerte']);
+Route::get('get/action', [PostController::class, 'getAction']);
 Route::get('get/post', [PostController::class, 'getAllPost']);
+Route::get('get/post/financement', [PostController::class, 'getAllPostFinancement']);
 Route::get('get/evennement', [PostController::class, 'getAllEvennement']);
 Route::get('get/city', [UserController::class, 'getCity']);
 
@@ -55,13 +57,14 @@ Route::middleware(['auth:sanctum', 'online'])->group(function () {
     Route::get('user/evennement/reaction', [ReactionController::class, 'reactionEvennementUser']);
     Route::get('user/post/reaction', [ReactionController::class, 'reactionPostUser']);
 
-    
+
     Route::post('post/create', [PostController::class, 'createPost']);
     Route::post('post/update', [PostController::class, 'updatePost']);
     Route::post('post/delete', [PostController::class, 'deletePost']);
     Route::post('post/share', [PostController::class, 'sharePost']);
     Route::post('post/reaction/add', [PostController::class, 'addReaction']);
     Route::post('post/action/add', [PostController::class, 'addAction']);
+    // Route::post('post/action/user', [PostController::class, 'toggleParticipation']);
     Route::post('post/reaction/delete', [PostController::class, 'deleteReaction']);
     Route::get('get/post/comment', [PostCommentsController::class, 'getPostComments']);
     Route::post('create/post/comment', [PostCommentsController::class, 'createComment']);
@@ -72,12 +75,12 @@ Route::middleware(['auth:sanctum', 'online'])->group(function () {
     Route::post('delete/comment/reaction', [PostCommentsController::class, 'deleteCommentReaction']);
     Route::get('get/reactions', [ReactionController::class, 'getReactions']);
     Route::post('user/posts', [PostController::class, 'getUserPost']);
-    
+
     Route::get('user/notification', [UserController::class, 'notify_user']);
     Route::post('user/notification/markasread', [UserController::class,'markAsRead']);
     Route::post('user/notification/settings', [UserController::class,'notificationSettings']);
     Route::get('user/info', [UserController::class,'infoUser']);
-    
+
     Route::controller(UserController::class)->group(function () {
         // Route::put('notification/token/refresh', 'refresh_token_notify');
         // Route::get('notifications', 'notifications');
@@ -102,7 +105,7 @@ Route::middleware(['auth:sanctum', 'online'])->group(function () {
         Route::post('chat/message/list', 'getMessageFor');
         Route::post('chat/verify', 'chatExist');
         Route::post('chat/read/message', 'readMessage');
-        
+
     });
 
 });
@@ -119,14 +122,14 @@ Route::get('postType/list', [PostTypeController::class, 'postTypeList']);
 Route::post('postType/create', [PostTypeController::class, 'createPostType']);
 Route::post('postType/update', [PostTypeController::class, 'updatePostType']);
 Route::post('postType/delete', [PostTypeController::class, 'deletePostType']);
- 
+
 
 //// Action post
 Route::get('action/list', [ActionController::class, 'listAction']);
 Route::post('action/create', [ActionController::class, 'createPostAction']);
 Route::post('action/update', [ActionController::class, 'updateAction']);
 Route::post('action/delete', [ActionController::class, 'deleteAction']);
- 
+
 
 Route::controller(AuthController::class)->group(function () {
     Route::post('password/email',  'forgotPassword');

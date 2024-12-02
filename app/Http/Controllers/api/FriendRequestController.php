@@ -13,7 +13,7 @@ class FriendRequestController extends Controller
 {
 
     /**
-     * Envoi de request d'ami 
+     * Envoi de request d'ami
      */
     public function sendFriendRequest(Request $request)
     {
@@ -23,7 +23,7 @@ class FriendRequestController extends Controller
 
         $verify = FriendRequest::where('sender_id', auth()->id())->where('receiver_id', $request->receiverId)->exists()
                     || FriendRequest::where('receiver_id', auth()->id())->where('sender_id', $request->receiverId)->exists();
-        if ($verify) 
+        if ($verify)
         {
             return response()->json(
                 [
@@ -48,7 +48,7 @@ class FriendRequestController extends Controller
     }
 
     /**
-     * Repondre à une request d'ami 
+     * Repondre à une request d'ami
      */
     public function respondToFriendRequest(Request $request)
     {
@@ -89,7 +89,7 @@ class FriendRequestController extends Controller
         $requests = $user->receivedFriendRequests()->where('status', 'pending')
             ->with('sender')
             ->with('receiver')
-            ->orderByFullname('Asc')
+            // ->orderBy('fullname')
             ->get();
         return response()->json(
             [
@@ -101,7 +101,7 @@ class FriendRequestController extends Controller
     }
 
     /**
-     * Liste des amis 
+     * Liste des amis
      */
     public function getFriendsList()
     {
@@ -116,12 +116,12 @@ class FriendRequestController extends Controller
         ->distinct()
         ->get()
         ->map(function($friendRequest) {
-            return $friendRequest->sender_id == auth()->id() 
-                ? $friendRequest->receiver 
+            return $friendRequest->sender_id == auth()->id()
+                ? $friendRequest->receiver
                 : $friendRequest->sender;
         });
 
-        $friends = $friends->transform(function($user) { 
+        $friends = $friends->transform(function($user) {
             $friendRequest = FriendRequest::where(function($query) use ($user) {
                                 $query->where('sender_id', auth()->id())
                                     ->where('receiver_id', $user->id);
@@ -147,7 +147,7 @@ class FriendRequestController extends Controller
     }
 
      /**
-     * Liste sugestion  d'amis 
+     * Liste sugestion  d'amis
      */
     public function getSuggestion()
     {
@@ -157,13 +157,13 @@ class FriendRequestController extends Controller
             })
             ->whereIn('status', ['accepted', 'pending']) // Utilise whereIn pour les deux statuts
             ->get(['sender_id', 'receiver_id']) // Récupère les deux colonnes en même temps
-            ->flatMap(function ($request) { 
+            ->flatMap(function ($request) {
                 return [$request->sender_id, $request->receiver_id];
             })
             ->unique()
             ->toArray();
 
-        
+
             $suggfriends = User::where(function($query) {
                         $query->where('country', 'like', '%' . Auth::user()->country . '%')
                             ->orWhere('city', 'like', '%' . Auth::user()->city . '%');
@@ -172,7 +172,7 @@ class FriendRequestController extends Controller
                     ->where('id', '!=', auth()->id())
                     ->get();
 
-            $suggfriends = $suggfriends->transform(function($user) { 
+            $suggfriends = $suggfriends->transform(function($user) {
                     $friendRequest = FriendRequest::where(function($query) use ($user) {
                                         $query->where('sender_id', auth()->id())
                                             ->where('receiver_id', $user->id);
@@ -188,7 +188,7 @@ class FriendRequestController extends Controller
                     return $user;
                 });
 
-    
+
 
         return response()->json(
             [
@@ -199,5 +199,5 @@ class FriendRequestController extends Controller
             ]);
     }
 
-    
+
 }

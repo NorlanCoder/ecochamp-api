@@ -5,8 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class PostAction extends Model
+class PostAction extends Pivot
 {
     use HasFactory;
     protected $fillable =
@@ -16,13 +17,13 @@ class PostAction extends Model
         'remove'
     ];
 
-    public function post(): BelongsTo
-    {
-        return $this->belongsTo(Post::class);
-    }
+    // public function post(): BelongsTo
+    // {
+    //     return $this->belongsTo(Post::class);
+    // }
 
-    public function action(): BelongsTo
-    {
-        return $this->belongsTo(Action::class);
-    }
+    // public function action(): BelongsTo
+    // {
+    //     return $this->belongsTo(Action::class);
+    // }
 }
