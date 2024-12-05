@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\Enums\Distributed_to;
+use App\Enums\Distributed_to;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -34,6 +34,7 @@ class PostUpdateRequest extends FormRequest
             'medias.*' => 'file',
             'tags' => 'array',
             'actions' => 'array',
+            'inscription_url' => 'url'
         ];
     }
 

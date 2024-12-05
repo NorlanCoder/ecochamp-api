@@ -37,6 +37,7 @@ class PostRequest extends FormRequest
             'medias.*' => 'file',
             'tags' => 'array',
             'actions' => 'array',
+            'inscription_url' => 'url'
         ];
     }
 

@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\Post\PostTypeController;
 // use App\Http\Controllers\Api\Chat\ConversationController;
 use App\Http\Controllers\Api\Chat\MessageController;
 use App\Http\Controllers\api\FriendRequestController;
+use App\Http\Controllers\api\Post\PostActionUserController;
 use App\Http\Controllers\api\ReactionController;
 use App\Http\Controllers\Api\User\UserController;
 use Illuminate\Http\Request;
@@ -45,9 +46,12 @@ Route::get('post', [PostController::class, 'getPost']);
 Route::get('get/alerte', [PostController::class, 'getAllAlerte']);
 Route::get('get/action', [PostController::class, 'getAction']);
 Route::get('get/post', [PostController::class, 'getAllPost']);
+Route::get('get/all/post', [PostController::class, 'getAlertEvennement']);
 Route::get('get/post/financement', [PostController::class, 'getAllPostFinancement']);
 Route::get('get/evennement', [PostController::class, 'getAllEvennement']);
 Route::get('get/city', [UserController::class, 'getCity']);
+Route::get('post/search', [PostController::class, 'getPostSearch']);
+
 
 Route::middleware(['auth:sanctum', 'online'])->group(function () {
     Route::get('user/posts', [PostController::class, 'getPostsUser']);
@@ -57,6 +61,12 @@ Route::middleware(['auth:sanctum', 'online'])->group(function () {
     Route::get('user/evennement/reaction', [ReactionController::class, 'reactionEvennementUser']);
     Route::get('user/post/reaction', [ReactionController::class, 'reactionPostUser']);
 
+    // Routes pour les opérations CRUD sur les post_action_users
+    Route::get('/post-action-users', [PostActionUserController::class, 'index']);
+    Route::post('create/post-action-users', [PostActionUserController::class, 'store']);
+    Route::get('/post-action-users/{postActionUser}', [PostActionUserController::class, 'show']);
+    Route::put('upadte/post-action-users/{postActionUser}', [PostActionUserController::class, 'update']);
+    Route::delete('delete/post-action-users/{postActionUser}', [PostActionUserController::class, 'destroy']);
 
     Route::post('post/create', [PostController::class, 'createPost']);
     Route::post('post/update', [PostController::class, 'updatePost']);
@@ -64,6 +74,7 @@ Route::middleware(['auth:sanctum', 'online'])->group(function () {
     Route::post('post/share', [PostController::class, 'sharePost']);
     Route::post('post/reaction/add', [PostController::class, 'addReaction']);
     Route::post('post/action/add', [PostController::class, 'addAction']);
+    
     // Route::post('post/action/user', [PostController::class, 'toggleParticipation']);
     Route::post('post/reaction/delete', [PostController::class, 'deleteReaction']);
     Route::get('get/post/comment', [PostCommentsController::class, 'getPostComments']);
@@ -138,7 +149,4 @@ Route::controller(AuthController::class)->group(function () {
 });
 
 Route::get('social/login', [AuthController::class, 'socialLogin']);
-
-
-
-
+   

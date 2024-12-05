@@ -24,6 +24,8 @@ class Post extends Model
         'status',
         'start_date',
         'end_date',
+        'address',
+        'inscription_url',
     ];
 
     public function user(): BelongsTo
@@ -53,8 +55,20 @@ class Post extends Model
 
     public function postActions(): BelongsToMany
     {
-        return $this->belongsToMany(Action::class,'post_actions')->using(PostAction::class)->withPivot('id');;
+        return $this->belongsToMany(Action::class, 'post_actions')
+                    ->using(PostAction::class)
+                    ->withPivot('id');
     }
+    // public function postActions(): HasMany
+    // {
+    //     return $this->hasMany(PostAction::class);
+    // }
+
+    // public function actions()
+    // {
+    //     return $this->hasManyThrough(Action::class, PostAction::class, 'post_id', 'id', 'id', 'action_id');
+    // }
+
 
     public function tags(): HasMany
     {

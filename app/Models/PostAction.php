@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 class PostAction extends Pivot
 {
     use HasFactory;
+
     protected $fillable =
     [
         'post_id',
@@ -25,5 +26,5 @@ class PostAction extends Pivot
     // public function action(): BelongsTo
     // {
     //     return $this->belongsTo(Action::class);
-    // }
+    // }    
 }

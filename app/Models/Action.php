@@ -17,6 +17,7 @@ class Action extends Model
 
     public function posts(): BelongsToMany
     {
-        return $this->belongsToMany(Post::class,'post_actions')->using(PostAction::class)->withPivot('id');;
+        return $this->belongsToMany(Post::class,'post_actions')->using(PostAction::class)->withPivot('id');
     }
-}
+}   
+   

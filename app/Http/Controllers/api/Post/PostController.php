@@ -291,7 +291,8 @@ class PostController extends Controller
             // ->where('remove', false)->get();
 
             $query->images = $images;
-            // $query->post_reactions = $postReactions;
+            // $query->post_actions = $query->actions;
+
 
             return $query;
         });
@@ -343,19 +344,17 @@ class PostController extends Controller
         ]);
     }
 
-    /**
-     *  Post Financement Lists
-     */
-    public function getAllPostFinancement() {
 
-        $post = Post::where('type', PostType::Evennement)
-        ->with('user')
+    /**
+     *  Post Alert Evennement Lists
+     */
+    public function getAlertEvennement(Request $request)      
+    {
+        $post = Post::with('user')
         ->with('comments')
         ->with('tags')
+        ->with('postActions')
         ->with('postReactionsWithoutRemove')
-        ->with(['postActions' => function (BelongsToMany $query) {
-            $query->where('label', 'Financement'); // Replace 'SpecificLabel' with the desired label
-        }])
         ->orderByDesc('created_at')->paginate(20);
 
         $post->getCollection()->transform(function($query) {
@@ -377,9 +376,89 @@ class PostController extends Controller
 
         return response()->json([
             'status' => 'sucess',
+            'message' => 'Post Alert Evennement',
+            'code' => 200,
+            'data' => $post,
+        ]);
+    }
+
+    /**
+     *  Post Financement Lists
+     */
+    public function getAllPostFinancement() {
+
+        $post = Post::where('type', PostType::Evennement)
+        ->with('user')
+        ->with('comments')
+        ->with('tags')
+        ->with('postReactionsWithoutRemove')
+        ->with(['postActions' => function (BelongsToMany $query) {
+            $query->where('label', 'Financement'); 
+        }])
+        ->orderByDesc('created_at')->paginate(20);
+
+        $post->getCollection()->transform(function($query) {
+            $images = PostMedia::where('post_id', $query->id)
+                    ->with('media')
+                    ->get()
+                    ->map(function ($postMedia) {
+                        return $postMedia->media->url_media;
+                    });
+
+            $query->images = $images;
+
+            return $query;
+        });
+
+        return response()->json([
+            'status' => 'sucess',
             'message' => 'Post',
             'code' => 200,
             'data' => $post,
+        ]);
+    }
+
+    /**
+     *  Post Rechercher Lists
+     */
+    public function getPostSearch(Request $request) {
+
+        $request->validate([
+            'search' => 'required'
+        ]);
+
+        $users = User::where('fullname', 'like', '%'.$request->search.'%')
+            ->orderByDesc('created_at')->limit(20)->get();
+
+        $posts = Post::where('title', 'like', '%'.$request->search.'%')
+            ->Orwhere('message', 'like', '%'.$request->search.'%')
+            ->with('user')
+            ->with('comments')
+            ->with('tags')
+            ->with('postReactionsWithoutRemove')
+            ->with('postActions')
+            ->orderByDesc('created_at')->limit(20)->get();
+
+        // $posts->getCollection()->transform(function($query) {
+        $posts->transform(function($query) {
+            $images = PostMedia::where('post_id', $query->id)
+                    ->with('media')
+                    ->get()
+                    ->map(function ($postMedia) {
+                        return $postMedia->media->url_media;
+                    });
+
+            $query->images = $images;
+
+            return $query;
+        });
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Recherche',
+            'code' => 200,
+            'post' => $posts,
+            'user' => $users,
         ]);
     }
 
@@ -445,6 +524,11 @@ class PostController extends Controller
             'status'        => isset($request->status)? $request->status : null,
             'start_date'        => isset($request->start_date)? $request->start_date : null,
             'end_date'      => isset($request->end_date)? $request->end_date : null,
+            'inscription_url'      => isset($request->inscription_url)? $request->inscription_url : null,
+            'city'      => isset($request->city)? $request->city : null,
+            'address'      => isset($request->address)? $request->address : null,
+            
+
         ]);
         if ($request->tags){
             foreach ($request->tags as $label) {
@@ -570,15 +654,6 @@ class PostController extends Controller
         }
         $postReaction = PostReaction::where('user_id',  $this->user->id)
             ->where('post_id', $post->id)->first();
-
-        // if(!$postReaction) {
-
-        //     $postReaction = PostReaction::create([
-        //         'user_id' => $this->user->id,
-        //         'post_id' => $post->id,
-        //         'reaction' => $request->reaction,
-        //     ]);
-        // }
 
         if($postReaction){
             if(!$postReaction->remove){
@@ -767,49 +842,3 @@ class PostController extends Controller
     }
 }
 
-
-// $follows = Follow::where('follower_user_id', $this->user->id)->get();
-            // $id_follows = [];
-            // foreach ($follows as $follow){
-            //     array_push($id_follows, $follow->id);
-            // }
-            // ->orwhere('country', $this->user->country)
-            //     ->orWhere('city', $this->user->city)
-                // ->OrwhereIn(
-                //     function($query) use($id_follows){
-                //         $query->whereIn('user_id', $id_follows);
-                //     })
-
-// else{
-        //     $validator = $request->validate([
-        //         'country' => ['string'],
-        //         'city' => ['string'],
-        //     ]);
-        //     $country = $request->country;
-        //     $city = $request->city;
-        //     if($country && $city){
-        //     $post = Post::where('type', PostType::Alerte)->where('distributed_to', '!=', Distributed_to::FOLLOWERS)
-        //     ->orWhere('country', $country)
-        //     ->orWhere('city', $city)
-        //     ->with('user')
-        //     ->with('comments')
-        //     ->with('postReactions')
-        //     ->with('postReactionsWithoutRemove')
-        //     ->orderByDesc('created_at')->paginate(20);
-
-        //     $post->getCollection()->transform(function($query) {
-        //         $images = PostMedia::where('post_id', $query->id)
-        //                 ->with('media')
-        //                 ->get()
-        //                 ->map(function ($postMedia) {
-        //                     return $postMedia->media->url_media;
-        //                 });
-
-        //         $query->images = $images;
-
-        //         return $query;
-        //     });
-        //     }
-
-        // }
-        // return $this->getPost();
