@@ -15,6 +15,7 @@ return new class extends Migration
             $table->timestamp('online')->nullable();
             $table->string('ifu')->nullable();
             $table->string('rccm')->nullable();
+            $table->string('publication_journal')->nullable();
             $table->string('address')->nullable();
         
         });
@@ -33,6 +34,7 @@ return new class extends Migration
             $table->dropIfExists('online');
             $table->dropIfExists('ifu');
             $table->dropIfExists('rccm');
+            $table->dropIfExists('publication_journal');
             $table->dropIfExists('address');
         });
         Schema::table('messages', function (Blueprint $table) {

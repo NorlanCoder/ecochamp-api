@@ -90,6 +90,7 @@ class AuthController extends Controller
             'account_type' => 'in:individual,ONG',
             'ifu' => 'string',
             'rccm' => 'string',
+            'publication_journal' => 'string',
             'address' => 'string',
         ]);
 
