@@ -559,10 +559,11 @@ class PostController extends Controller
         if($request->actions){
 
             foreach ($request->actions as $action) {
-                $post_action = PostAction::create([
-                    'post_id' => $post->id,
-                    'action_id' => intval($action),
-                ]);
+                // $post_action = DB::table('post_actions')->insert([
+                //     'post_id' => $post->id,
+                //     'action_id' => intval($action),
+                // ]);
+                $post->actions()->attach(intval($action));
             }
         }
         return response()->json([
