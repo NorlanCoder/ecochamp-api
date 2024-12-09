@@ -72,6 +72,8 @@ Route::middleware(['auth:sanctum', 'online'])->group(function () {
     Route::post('post/update', [PostController::class, 'updatePost']);
     Route::post('post/delete', [PostController::class, 'deletePost']);
     Route::post('post/share', [PostController::class, 'sharePost']);
+    Route::post('post/desactive/alert', [PostController::class, 'desactiveAlert']);
+    
     Route::post('post/reaction/add', [PostController::class, 'addReaction']);
     Route::post('post/action/add', [PostController::class, 'addAction']);
     

@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Http\Request;
 use Illuminate\Log\Logger;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
@@ -506,6 +507,36 @@ class PostController extends Controller
     }
 
     /**
+     * Desactive Post Alert
+     */
+    public function desactiveAlert(Request $request)
+    {
+        $validator = $request->validate([
+            'id' => ['exists:App\Models\Post,id'],
+        ]);
+        $id = $request->id;
+
+        $post = Post::where('id', $id)
+            ->first();
+        if(!$post){
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'post n\'exist pas',
+                'code' => '404',
+                'data' => null,
+            ]);
+        }
+        $post->active = false;
+        $post->save();
+        return response()->json([
+            'status' => 'sucess',
+            'message' => 'Alert désactivé',
+            'code' => 200,
+            'data' => $post,
+        ]);
+    }
+
+    /**
      * create post
      */
     public function createPost(PostRequest $request)
@@ -559,11 +590,11 @@ class PostController extends Controller
         if($request->actions){
 
             foreach ($request->actions as $action) {
-                // $post_action = DB::table('post_actions')->insert([
-                //     'post_id' => $post->id,
-                //     'action_id' => intval($action),
-                // ]);
-                $post->actions()->attach(intval($action));
+                $post_action = DB::table('post_actions')->insert([
+                    'post_id' => $post->id,
+                    'action_id' => intval($action),
+                ]);
+                // $post->actions()->attach(intval($action));
             }
         }
         return response()->json([
