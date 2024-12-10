@@ -515,9 +515,8 @@ class PostController extends Controller
             'id' => ['exists:App\Models\Post,id'],
         ]);
         $id = $request->id;
+        $post = Post::where('id', $id)->first();
 
-        $post = Post::where('id', $id)
-            ->first();
         if(!$post){
             return response()->json([
                 'status' => 'failed',

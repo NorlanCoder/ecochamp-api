@@ -38,7 +38,7 @@ class PostActionUserController extends Controller
          if ($request->post_actions){
             foreach ($request->post_actions as $post_action_id) {
                 $postActionUser = PostActionUser::create([
-                    'post_action_id' => $request->post_action_id,
+                    'post_action_id' => $post_action_id,
                     'user_id' => Auth::id(), 
                     'remove' => $request->remove ?? false,
                 ]);
