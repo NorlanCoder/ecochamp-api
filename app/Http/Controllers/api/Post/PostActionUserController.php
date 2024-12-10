@@ -3,9 +3,13 @@
 namespace App\Http\Controllers\api\Post;
 
 use App\Http\Controllers\Controller;
+use App\Models\Post;
+use App\Models\PostAction;
 use App\Models\PostActionUser;
+use App\Models\PostMedia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PostActionUserController extends Controller
 {
@@ -14,16 +18,68 @@ class PostActionUserController extends Controller
      */
      public function index()
      {
-        $postActionUsers = PostActionUser::where('user_id', Auth::id())->get();
+        $postActionUsers = PostActionUser::where('user_id', Auth::id())
+            ->get();
+            $posts = [];
+            if($postActionUsers) {
+                foreach ($postActionUsers as $post_action) {
+                    $post_actions = DB::table('post_actions')->where('id', $post_action->post_action_id)->first();
+                    $post = Post::where('id', $post_actions->post_id)
+                        ->with('user')
+                        ->with('comments')
+                        ->with('tags')
+                        ->with('postReactionsWithoutRemove')
+                        ->with('postActions')
+                        ->first();
+                    $images = PostMedia::where('post_id', $post->id)
+                        ->with('media')
+                        ->get()
+                        ->map(function ($postMedia) {
+                            return $postMedia->media->url_media;
+                        });
+                    $post->images = $images;
+                    $posts[] = [
+                        'post_action_user' => $post_action,
+                        'post' => $post
+                    ];
+                }
+            }
 
          return response()->json(
             [   
                 'code' =>200,
                 'success' => true,
-                'data' => $postActionUsers,
+                'data' => $posts,
             ]
         );
      }
+
+     /**
+     * Liste des particitions sans Post
+     */
+    public function postActionUser()
+    {
+       $postActionUsers = PostActionUser::where('user_id', Auth::id())
+           ->get()->unique('post_action_id');
+           $posts = [];
+           if($postActionUsers) {
+               foreach ($postActionUsers as $post_action) {
+                   $post_actions = DB::table('post_actions')->where('id', $post_action->post_action_id)->first();
+                   $post_action->post_action = $post_actions;
+                   $posts[] = [
+                       'post_action_user' => $post_action,
+                   ];
+               }
+           }
+
+        return response()->json(
+           [   
+               'code' =>200,
+               'success' => true,
+               'data' => $posts,
+           ]
+       );
+    }
  
      /**
      * create action user post
@@ -119,5 +175,5 @@ class PostActionUserController extends Controller
                 'message' => 'Deleted successfully'
             ]
         );
-     }
+    }
 }            

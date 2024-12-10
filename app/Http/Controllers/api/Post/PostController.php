@@ -419,6 +419,70 @@ class PostController extends Controller
         ]);
     }
 
+
+    /**
+     *  Post Evennment with user for Action Lists
+     */
+    public function getUsersEvennement(Request $request) {
+
+        $request->validate([
+            'id' => 'required|exists:posts,id',
+        ]);
+
+        $post = Post::where('id', $request->id)
+        ->where('type', PostType::Evennement)
+        ->with('user')
+        ->with('comments')
+        ->with('tags')
+        ->with('postReactionsWithoutRemove')
+        ->with('postActions')
+        ->first();
+
+        if(!$post){
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Post n\'exist pas',
+                'code' => 404,
+                'data' => null,
+            ]);
+        }
+
+        $images = PostMedia::where('post_id', $post->id)
+                    ->with('media')
+                    ->get()
+                    ->map(function ($postMedia) {
+                        return $postMedia->media->url_media;
+                    });
+
+        $post->images = $images;
+            
+        $usersByAction = [];
+        
+        if($post->postActions) {
+            foreach ($post->postActions as $action) {
+                // return $action->id;
+                $actionUsers = PostActionUser::where('post_action_id', $action->pivot->id)
+                    ->with('user')
+                    ->get()
+                    ->pluck('user') // Récupère uniquement les utilisateurs associés
+                    ->unique('id');
+            
+                $usersByAction[] = [
+                    'action' => $action->value,
+                    'users' => $actionUsers
+                ];
+            }
+        }
+
+        return response()->json([
+            'status' => 'sucess',
+            'message' => 'Post',
+            'code' => 200,
+            'usersByAction' => $usersByAction,
+            'data' => $post,
+        ]);
+    }
+
     /**
      *  Post Rechercher Lists
      */
@@ -515,7 +579,8 @@ class PostController extends Controller
             'id' => ['exists:App\Models\Post,id'],
         ]);
         $id = $request->id;
-        $post = Post::where('id', $id)->first();
+        $post = Post::where('id', $id)
+            ->where('user_id', Auth::user()->id)->first();
 
         if(!$post){
             return response()->json([

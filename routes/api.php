@@ -67,7 +67,8 @@ Route::middleware(['auth:sanctum', 'online'])->group(function () {
     Route::get('/post-action-users/{postActionUser}', [PostActionUserController::class, 'show']);
     Route::put('upadte/post-action-users/{postActionUser}', [PostActionUserController::class, 'update']);
     Route::delete('delete/post-action-users/{postActionUser}', [PostActionUserController::class, 'destroy']);
-
+    Route::get('list/post-action-users', [PostActionUserController::class, 'postActionUser']);
+    
     Route::post('post/create', [PostController::class, 'createPost']);
     Route::post('post/update', [PostController::class, 'updatePost']);
     Route::post('post/delete', [PostController::class, 'deletePost']);
@@ -76,6 +77,7 @@ Route::middleware(['auth:sanctum', 'online'])->group(function () {
     
     Route::post('post/reaction/add', [PostController::class, 'addReaction']);
     Route::post('post/action/add', [PostController::class, 'addAction']);
+    Route::get('list/users/evennement', [PostController::class, 'getUsersEvennement']);
     
     // Route::post('post/action/user', [PostController::class, 'toggleParticipation']);
     Route::post('post/reaction/delete', [PostController::class, 'deleteReaction']);
