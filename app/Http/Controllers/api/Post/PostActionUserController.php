@@ -18,31 +18,58 @@ class PostActionUserController extends Controller
      */
      public function index()
      {
-        $postActionUsers = PostActionUser::where('user_id', Auth::id())
-            ->get();
+        $postAction_ids = PostActionUser::where('user_id', Auth::id())
+            ->get()->unique('post_action_id')->pluck('post_action_id');
+
+            $post_actions = DB::table('post_actions')->whereIn('id', $postAction_ids)->get()->unique('post_id');
+
             $posts = [];
-            if($postActionUsers) {
-                foreach ($postActionUsers as $post_action) {
-                    $post_actions = DB::table('post_actions')->where('id', $post_action->post_action_id)->first();
-                    $post = Post::where('id', $post_actions->post_id)
-                        ->with('user')
-                        ->with('comments')
-                        ->with('tags')
-                        ->with('postReactionsWithoutRemove')
-                        ->with('postActions')
-                        ->first();
-                    $images = PostMedia::where('post_id', $post->id)
-                        ->with('media')
-                        ->get()
-                        ->map(function ($postMedia) {
-                            return $postMedia->media->url_media;
-                        });
-                    $post->images = $images;
-                    $posts[] = [
-                        'post_action_user' => $post_action,
-                        'post' => $post
-                    ];
+            if($post_actions) {
+                foreach ($post_actions as $post_action) {
+                    $post_id = $post_action->post_id;
+                    $post = Post::where('id', $post_id)->first();
+                    
+                    if ($post_action) {
+                        $post_action_id = $post_action->id;
+                    }
+                    $post_action_user = PostActionUser::where('user_id', Auth::id())->where('post_action_id', $post_action_id)->first();
+                    if ($post_action_user) {
+                        $post_actions = DB::table('post_actions')->whereIn('id', $postAction_ids)->get();
+                        $post_action_user->post_action = $post_actions;
+                        $post_action_user->post_id = $post_id;
+                    
+                        $post = Post::where('id', $post_id)
+                            ->with('user')
+                            ->with('comments')
+                            ->with('tags')
+                            ->with('postReactionsWithoutRemove')
+                            ->with('postActions')
+                            ->first();
+                        $images = PostMedia::where('post_id', $post->id)
+                            ->with('media')
+                            ->get()
+                            ->map(function ($postMedia) {
+                                return $postMedia->media->url_media;
+                            });
+                        $post->images = $images;
+                        $posts[] = [
+                            'post_action_user' => $post_action_user,
+                            'post' => $post
+                        ];
+                    }else {
+                        // Créer un nouvel enregistrement si aucun n'existe
+                        $post_action_user = new PostActionUser();
+                        $post_action_user->user_id = Auth::id();
+                        $post_action_user->post_action_id = $post_action_id;
+                        $post_action_user->post_id = $post_id;
+                
+                        $posts[] = [
+                            'post_action_user' => $post_action_user,
+                            'post' => $post
+                        ];
+                    }
                 }
+
             }
 
          return response()->json(
@@ -59,27 +86,52 @@ class PostActionUserController extends Controller
      */
     public function postActionUser()
     {
-       $postActionUsers = PostActionUser::where('user_id', Auth::id())
-           ->get()->unique('post_action_id');
-           $posts = [];
-           if($postActionUsers) {
-               foreach ($postActionUsers as $post_action) {
-                   $post_actions = DB::table('post_actions')->where('id', $post_action->post_action_id)->first();
-                   $post_action->post_action = $post_actions;
-                   $posts[] = [
-                       'post_action_user' => $post_action,
-                   ];
-               }
-           }
+        $postAction_ids = PostActionUser::where('user_id', Auth::id())
+            ->get()->unique('post_action_id')->pluck('post_action_id');
+
+        $post_actions = DB::table('post_actions')->whereIn('id', $postAction_ids)->get()->unique('post_id');
+
+
+            $posts = [];
+            if($post_actions) {
+                foreach ($post_actions as $post_action) {
+                    // $post = Post::where('id', $post_id)->first();
+                    if ($post_action) {
+                        $post_action_id = $post_action->id;
+                    }
+                    
+                    $post_action_user = PostActionUser::where('user_id', Auth::id())->where('post_action_id', $post_action_id)->first();
+                    if ($post_action_user) {
+                        $post_actions = DB::table('post_actions')->whereIn('id', $postAction_ids)->get();
+                        $post_action_user->post_action = $post_actions;
+                        $post_action_user->post_id = $post_action->post_id;
+                        $posts[] = [
+                            'post_action_user' => $post_action_user,
+                        ];
+
+                    }else {
+                        // Créer un nouvel enregistrement si aucun n'existe
+                        $post_action_user = new PostActionUser();
+                        $post_action_user->user_id = Auth::id();
+                        $post_action_user->post_action_id = $post_action_id;
+                        $post_action_user->post_id = $post_action->post_id;
+                
+                        $posts[] = [
+                            'post_action_user' => $post_action_user,
+                        ];
+                    }
+                }
+            }
 
         return response()->json(
-           [   
-               'code' =>200,
-               'success' => true,
-               'data' => $posts,
-           ]
-       );
+            [   
+                'code' =>200,
+                'success' => true,
+                'data' => $posts,
+            ]
+        );
     }
+
  
      /**
      * create action user post
@@ -88,10 +140,17 @@ class PostActionUserController extends Controller
      {
          $request->validate([
              'post_actions.*' => 'required|exists:post_actions,id',
+             'post_id' => 'required|exists:posts,id'
             //  'remove' => 'boolean',
          ]);
  
          if ($request->post_actions){
+            $post_action_ids = DB::table('post_actions')->where('post_id', $request->post_id)->get()->pluck('id');
+            $postActionUser = PostActionUser::where('user_id', Auth::id())
+                    ->whereIn('post_action_id', $post_action_ids)->get();
+            foreach ($postActionUser as $post_action_user) {
+                $post_action_user->delete();
+            }
             foreach ($request->post_actions as $post_action_id) {
                 $postActionUser = PostActionUser::create([
                     'post_action_id' => $post_action_id,
@@ -165,8 +224,7 @@ class PostActionUserController extends Controller
              return response()->json(['error' => 'Unauthorized'], 403);
          }
  
-         $postActionUser->remove = true; 
-         $postActionUser->save();
+         $postActionUser->delete();
  
         return response()->json(
             [   

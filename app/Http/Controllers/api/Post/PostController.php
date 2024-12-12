@@ -860,12 +860,12 @@ class PostController extends Controller
             'end_date'      => isset($request->end_date)? $request->end_date : null,
         ]);
 
-        PostAction::where('post_id', $post->id)->delete();
+        DB::table('post_actions')->where('post_id', $post->id)->delete();
 
         if($request->actions){
 
             foreach ($request->actions as $action) {
-                $post_action = PostAction::create([
+                $post_action = DB::table('post_actions')->create([
                     'post_id' => $post->id,
                     'action_id' => $action->id,
                 ]);

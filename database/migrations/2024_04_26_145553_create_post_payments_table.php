@@ -13,11 +13,13 @@ return new class extends Migration
     {
         Schema::create('post_payments', function (Blueprint $table) {
             $table->id();
-            $table->integer('amount');
+            $table->float('amount');
             $table->foreignId('donator_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('action_id')->constrained('actions')->onDelete('cascade');
+            $table->foreignId('action_id')->constrained('actions')->onDelete('cascade')->nullable();
             $table->foreignId('post_id')->constrained('posts')->onDelete('cascade');
-            $table->string('status');
+            $table->string('status')->nullable();
+            $table->string('action')->nullable();
+            $table->text('mot_soutien')->nullable();
             $table->timestamps();
         });
     }

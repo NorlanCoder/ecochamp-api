@@ -11,8 +11,10 @@ use App\Http\Controllers\Api\Post\PostTypeController;
 // use App\Http\Controllers\Api\Chat\ConversationController;
 use App\Http\Controllers\Api\Chat\MessageController;
 use App\Http\Controllers\api\FriendRequestController;
+use App\Http\Controllers\api\PaymentController;
 use App\Http\Controllers\api\Post\PostActionUserController;
 use App\Http\Controllers\api\ReactionController;
+use App\Http\Controllers\api\StatisticController;
 use App\Http\Controllers\Api\User\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -52,8 +54,9 @@ Route::get('get/evennement', [PostController::class, 'getAllEvennement']);
 Route::get('get/city', [UserController::class, 'getCity']);
 Route::get('post/search', [PostController::class, 'getPostSearch']);
 
-
 Route::middleware(['auth:sanctum', 'online'])->group(function () {
+    Route::post('soutien/callback', [PaymentController::class, 'soutienCallback']);
+    
     Route::get('user/posts', [PostController::class, 'getPostsUser']);
     Route::get('user/alertes', [PostController::class, 'getAlerteUsers']);
     Route::get('user/evennements', [PostController::class, 'getEvennementUsers']);
@@ -63,6 +66,7 @@ Route::middleware(['auth:sanctum', 'online'])->group(function () {
 
     // Routes pour les opérations CRUD sur les post_action_users
     Route::get('/post-action-users', [PostActionUserController::class, 'index']);
+    Route::get('/account', [StatisticController::class, 'index']);
     Route::post('create/post-action-users', [PostActionUserController::class, 'store']);
     Route::get('/post-action-users/{postActionUser}', [PostActionUserController::class, 'show']);
     Route::put('upadte/post-action-users/{postActionUser}', [PostActionUserController::class, 'update']);
