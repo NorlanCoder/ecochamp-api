@@ -67,6 +67,9 @@ Route::middleware(['auth:sanctum', 'online'])->group(function () {
     // Routes pour les opérations CRUD sur les post_action_users
     Route::get('/post-action-users', [PostActionUserController::class, 'index']);
     Route::get('/account', [StatisticController::class, 'index']);
+    Route::get('historique/don/recu', [StatisticController::class, 'donRecu']);
+    Route::get('historique/don/fait', [StatisticController::class, 'donFait']);
+
     Route::post('create/post-action-users', [PostActionUserController::class, 'store']);
     Route::get('/post-action-users/{postActionUser}', [PostActionUserController::class, 'show']);
     Route::put('upadte/post-action-users/{postActionUser}', [PostActionUserController::class, 'update']);

@@ -35,6 +35,10 @@ class StatisticController extends Controller
             ->count();
         $account = Account::where('user_id', Auth::id())->first();
         $mesdon = PostPayment::where('donator_id', Auth::id())->count();
+        $mesdon = PostPayment::where('donator_id', Auth::id())->count();
+
+        $post_ids = Post::where('user_id', Auth::id())->get()->pluck('id');
+        $messoutiens = PostPayment::whereIn('post_id', $post_ids)->count();
 
           
         $list = [
@@ -42,7 +46,8 @@ class StatisticController extends Controller
             'mesEvennements' => $mesEvennement,
             'participations' => $participation,
             'reactions' => $reaction,
-            'mesfinancements' => $mesdon,
+            'mesdons' => $mesdon,
+            'messoutiens' => $messoutiens,
             'account' => $account
         ];
 
@@ -53,5 +58,52 @@ class StatisticController extends Controller
                'data' => $list,
            ]
        );
+    }
+
+
+    /**
+     * Historique des donations faites
+     * 
+     * @return \Illuminate\Http\Response
+     * 
+     */
+    public function donFait(Request $request){
+
+        $dons = PostPayment::where('donator_id', Auth::id());
+
+        $data = [
+            'solde_dons' => $dons->sum('amount'),
+            'list_dons' => $dons->get()
+        ];
+
+        return response()->json([
+            'success' => true,
+            'data' => $data,
+        ]);
+    }
+
+
+    /**
+     * Historique des donations reçus
+     * 
+     * @return \Illuminate\Http\Response
+     * 
+     */
+    public function donRecu(Request $request){ 
+
+        $post_ids = Post::where('user_id', Auth::id())->get()->pluck('id');
+        $dons = PostPayment::whereIn('post_id', $post_ids);
+        $account = Account::where('user_id', Auth::id())->first();
+
+        $data = [
+            'solde' => $account->solde ?? 0,
+            'solde_dons' => $dons->sum('amount'),
+            'list_dons' => $dons->get()
+        ];
+        
+        return response()->json([
+            'success' => true,
+            'data' => $data,
+        ]);
     }
 }
