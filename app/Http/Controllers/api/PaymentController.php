@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\api;
 
+use App\Enums\RetraitEnum;
 use App\Http\Controllers\Controller;
 use App\Models\Account;
 use App\Models\Post;
 use App\Models\PostPayment;
 use App\Models\User;
+use App\Models\WithdrawRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -59,7 +61,7 @@ class PaymentController extends Controller
                 // 'reference' => $data['reference'],
                 // 'transaction_id' => $request->id,
                 ]);
-            $account = Account::find($post->user_id);
+            $account = Account::where('user_id', $post->user_id)->first();
             
             if($account){
                 $account->solde += $data['amount'];
@@ -81,6 +83,32 @@ class PaymentController extends Controller
             DB::rollback();
             return response()->json(["errors" => $e->getMessage(), "status" => 500], 500);
         }
+    }   
+
+    /**
+     * Demande de retrait
+     * 
+     * @return \Illuminate\Http\Response
+     * 
+     */
+    public function demandeRetrait(Request $request){
+        $request->validate([
+            'montant' => 'required',
+            'phone' => 'required',
+        ]);
+
+        $retrait = WithdrawRequest::create([
+            'montant' => $request->montant,
+            'user_id' => Auth::id(),
+            'status' => RetraitEnum::IN_PROGRESS,
+            'phone' => $request->phone,
+        ]);
+
+        return response()->json([
+            'messeage' => 'Demande en cours',
+            'data' => $retrait,
+            'success' => true,
+        ]);
     }
 
 }

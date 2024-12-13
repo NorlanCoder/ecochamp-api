@@ -10,7 +10,7 @@ use App\Http\Requests\PostReactionRequest;
 use App\Http\Requests\PostRequest;
 use App\Http\Requests\PostUpdateRequest;
 use App\Models\Action;
-use App\Models\Follow;
+use App\Models\PostPayment;
 use App\Models\FriendRequest;
 use App\Models\Media;
 use App\Models\Post;
@@ -464,13 +464,21 @@ class PostController extends Controller
                 $actionUsers = PostActionUser::where('post_action_id', $action->pivot->id)
                     ->with('user')
                     ->get()
-                    ->pluck('user') // Récupère uniquement les utilisateurs associés
-                    ->unique('id');
-            
-                $usersByAction[] = [
-                    'action' => $action->value,
-                    'users' => $actionUsers
-                ];
+                    ->pluck('user')
+                    ->unique('post_action_id');
+                    
+                if($action->id == 3){
+                    $dons = PostPayment::where('post_id', $action->pivot->post_id)->get();
+                    $usersByAction[] = [
+                        'action' => $action->value,
+                        'users' => $dons
+                    ];
+                }else{
+                    $usersByAction[] = [
+                        'action' => $action->value,
+                        'users' => $actionUsers
+                    ];
+                }
             }
         }
 

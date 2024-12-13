@@ -68,7 +68,7 @@ class PostCommentsController extends Controller
             ]);
         
             $post->user->notify(new UserNotification(
-                NotificationType::Love,
+                NotificationType::Comment,
                 'Un nouveau commentaire pour votre post.',
                 auth()->user()->fullname,
                 $request->post_id

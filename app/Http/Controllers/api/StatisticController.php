@@ -9,6 +9,7 @@ use App\Models\Post;
 use App\Models\PostActionUser;
 use App\Models\PostPayment;
 use App\Models\PostReaction;
+use App\Models\WithdrawRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -93,12 +94,14 @@ class StatisticController extends Controller
 
         $post_ids = Post::where('user_id', Auth::id())->get()->pluck('id');
         $dons = PostPayment::whereIn('post_id', $post_ids);
+        $retraits = WithdrawRequest::where('user_id', Auth::id());
         $account = Account::where('user_id', Auth::id())->first();
 
         $data = [
             'solde' => $account->solde ?? 0,
             'solde_dons' => $dons->sum('amount'),
-            'list_dons' => $dons->get()
+            'list_dons' => $dons->get(),
+            'list_retraits' => $retraits->get(),
         ];
         
         return response()->json([

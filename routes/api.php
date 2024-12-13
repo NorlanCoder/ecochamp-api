@@ -56,6 +56,7 @@ Route::get('post/search', [PostController::class, 'getPostSearch']);
 
 Route::middleware(['auth:sanctum', 'online'])->group(function () {
     Route::post('soutien/callback', [PaymentController::class, 'soutienCallback']);
+    Route::post('demande/retrait', [PaymentController::class, 'demandeRetrait']);
     
     Route::get('user/posts', [PostController::class, 'getPostsUser']);
     Route::get('user/alertes', [PostController::class, 'getAlerteUsers']);
