@@ -112,6 +112,7 @@ class ReactionController extends Controller
                 ->with('comments')
                 ->with('tags')
                 ->with('postReactionsWithoutRemove')
+                ->with('postActions')
                 ->orderByDesc('created_at')->paginate(20);
 
            

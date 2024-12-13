@@ -18,6 +18,7 @@ class Post extends Model
         'message',
         'country',
         'city',
+        'active',
         'type',
         'distributed_to',
         'type_id',

@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Http\Request;
 use Illuminate\Log\Logger;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
@@ -418,6 +419,70 @@ class PostController extends Controller
         ]);
     }
 
+
+    /**
+     *  Post Evennment with user for Action Lists
+     */
+    public function getUsersEvennement(Request $request) {
+
+        $request->validate([
+            'id' => 'required|exists:posts,id',
+        ]);
+
+        $post = Post::where('id', $request->id)
+        ->where('type', PostType::Evennement)
+        ->with('user')
+        ->with('comments')
+        ->with('tags')
+        ->with('postReactionsWithoutRemove')
+        ->with('postActions')
+        ->first();
+
+        if(!$post){
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Post n\'exist pas',
+                'code' => 404,
+                'data' => null,
+            ]);
+        }
+
+        $images = PostMedia::where('post_id', $post->id)
+                    ->with('media')
+                    ->get()
+                    ->map(function ($postMedia) {
+                        return $postMedia->media->url_media;
+                    });
+
+        $post->images = $images;
+            
+        $usersByAction = [];
+        
+        if($post->postActions) {
+            foreach ($post->postActions as $action) {
+                // return $action->id;
+                $actionUsers = PostActionUser::where('post_action_id', $action->pivot->id)
+                    ->with('user')
+                    ->get()
+                    ->pluck('user') // Récupère uniquement les utilisateurs associés
+                    ->unique('id');
+            
+                $usersByAction[] = [
+                    'action' => $action->value,
+                    'users' => $actionUsers
+                ];
+            }
+        }
+
+        return response()->json([
+            'status' => 'sucess',
+            'message' => 'Post',
+            'code' => 200,
+            'usersByAction' => $usersByAction,
+            'data' => $post,
+        ]);
+    }
+
     /**
      *  Post Rechercher Lists
      */
@@ -506,6 +571,36 @@ class PostController extends Controller
     }
 
     /**
+     * Desactive Post Alert
+     */
+    public function desactiveAlert(Request $request)
+    {
+        $validator = $request->validate([
+            'id' => ['exists:App\Models\Post,id'],
+        ]);
+        $id = $request->id;
+        $post = Post::where('id', $id)
+            ->where('user_id', Auth::user()->id)->first();
+
+        if(!$post){
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'post n\'exist pas',
+                'code' => '404',
+                'data' => null,
+            ]);
+        }
+        $post->active = false;
+        $post->save();
+        return response()->json([
+            'status' => 'sucess',
+            'message' => 'Alert désactivé',
+            'code' => 200,
+            'data' => $post,
+        ]);
+    }
+
+    /**
      * create post
      */
     public function createPost(PostRequest $request)
@@ -559,10 +654,11 @@ class PostController extends Controller
         if($request->actions){
 
             foreach ($request->actions as $action) {
-                $post_action = PostAction::create([
+                $post_action = DB::table('post_actions')->insert([
                     'post_id' => $post->id,
                     'action_id' => intval($action),
                 ]);
+                // $post->actions()->attach(intval($action));
             }
         }
         return response()->json([
@@ -764,12 +860,12 @@ class PostController extends Controller
             'end_date'      => isset($request->end_date)? $request->end_date : null,
         ]);
 
-        PostAction::where('post_id', $post->id)->delete();
+        DB::table('post_actions')->where('post_id', $post->id)->delete();
 
         if($request->actions){
 
             foreach ($request->actions as $action) {
-                $post_action = PostAction::create([
+                $post_action = DB::table('post_actions')->create([
                     'post_id' => $post->id,
                     'action_id' => $action->id,
                 ]);

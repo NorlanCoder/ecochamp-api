@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Action;
 use App\Models\Media;
 use App\Models\Post;
 use App\Models\PostMedia;
@@ -95,5 +96,20 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-    }        
+        $action = Action::create([
+            'label' => 'benevole',
+            'value' => 'Bénevolat',
+        ]);
+        $action = Action::create([
+            'label' => 'participant',
+            'value' => 'Participation',
+        ]);
+        $action = Action::create([
+            'label' => 'financement',
+            'value' => 'Financement',
+        ]);
+
+    }     
+    
+    
 }

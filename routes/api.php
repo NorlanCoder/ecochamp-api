@@ -11,8 +11,10 @@ use App\Http\Controllers\Api\Post\PostTypeController;
 // use App\Http\Controllers\Api\Chat\ConversationController;
 use App\Http\Controllers\Api\Chat\MessageController;
 use App\Http\Controllers\api\FriendRequestController;
+use App\Http\Controllers\api\PaymentController;
 use App\Http\Controllers\api\Post\PostActionUserController;
 use App\Http\Controllers\api\ReactionController;
+use App\Http\Controllers\api\StatisticController;
 use App\Http\Controllers\Api\User\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -52,8 +54,9 @@ Route::get('get/evennement', [PostController::class, 'getAllEvennement']);
 Route::get('get/city', [UserController::class, 'getCity']);
 Route::get('post/search', [PostController::class, 'getPostSearch']);
 
-
 Route::middleware(['auth:sanctum', 'online'])->group(function () {
+    Route::post('soutien/callback', [PaymentController::class, 'soutienCallback']);
+    
     Route::get('user/posts', [PostController::class, 'getPostsUser']);
     Route::get('user/alertes', [PostController::class, 'getAlerteUsers']);
     Route::get('user/evennements', [PostController::class, 'getEvennementUsers']);
@@ -63,17 +66,25 @@ Route::middleware(['auth:sanctum', 'online'])->group(function () {
 
     // Routes pour les opérations CRUD sur les post_action_users
     Route::get('/post-action-users', [PostActionUserController::class, 'index']);
+    Route::get('/account', [StatisticController::class, 'index']);
+    Route::get('historique/don/recu', [StatisticController::class, 'donRecu']);
+    Route::get('historique/don/fait', [StatisticController::class, 'donFait']);
+
     Route::post('create/post-action-users', [PostActionUserController::class, 'store']);
     Route::get('/post-action-users/{postActionUser}', [PostActionUserController::class, 'show']);
     Route::put('upadte/post-action-users/{postActionUser}', [PostActionUserController::class, 'update']);
     Route::delete('delete/post-action-users/{postActionUser}', [PostActionUserController::class, 'destroy']);
-
+    Route::get('list/post-action-users', [PostActionUserController::class, 'postActionUser']);
+    
     Route::post('post/create', [PostController::class, 'createPost']);
     Route::post('post/update', [PostController::class, 'updatePost']);
     Route::post('post/delete', [PostController::class, 'deletePost']);
     Route::post('post/share', [PostController::class, 'sharePost']);
+    Route::post('post/desactive/alert', [PostController::class, 'desactiveAlert']);
+    
     Route::post('post/reaction/add', [PostController::class, 'addReaction']);
     Route::post('post/action/add', [PostController::class, 'addAction']);
+    Route::get('list/users/evennement', [PostController::class, 'getUsersEvennement']);
     
     // Route::post('post/action/user', [PostController::class, 'toggleParticipation']);
     Route::post('post/reaction/delete', [PostController::class, 'deleteReaction']);

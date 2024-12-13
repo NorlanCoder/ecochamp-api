@@ -22,7 +22,7 @@ class UserOnligne implements ShouldBroadcast
 
     public function broadcastOn(): Channel
     {
-        Log::info('User is online:', ['user' => $this->user]);
+        // Log::info('User is online:', ['user' => $this->user]);
         return new Channel('onligne.' . $this->user['id']);
     }
 
