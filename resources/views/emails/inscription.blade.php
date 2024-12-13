@@ -28,7 +28,7 @@
 <body>
     <h1><img src="{{asset('assets/icon.png')}}" width="50" alt=""></h1>
     <main>
-        <p>Bonjour <strong>John Doe</strong></p>
+        <p>Bonjour <strong>{{ $user->fullname }}</strong></p>
         <p>Bienvenue parmi nous ! 🎉 Toute l’équipe de <strong>Ecochamp</strong> est ravie de vous compter parmi les <strong>eco-citoyen</strong>.</p>
         <p>Si vous avez des questions ou besoin d’aide, notre équipe est disponible pour vous accompagner. Vous pouvez nous écrire à <a href="mailto:support@ecochamp.org">support@ecochamp.org</a> ou visiter notre FAQ.</p>
         <p>Encore une fois, bienvenue dans notre communauté !</p>

@@ -31,8 +31,8 @@
         <p style="text-align: center">
             <img src="{{asset('assets/financement.png')}}" width="100" alt="">
         </p>
-        <p>Bonjour <strong>John Doe</strong></p>
-        <p>Nous avons le plaisir de vous avez reçu un nouveau financement de <strong>10.000 XOF</strong> avec succès. 🎉</p>
+        <p>Bonjour <strong>{{ $user->fullname }}</strong></p>
+        <p>Nous avons le plaisir de vous avez reçu un nouveau financement de <strong>{{ $montant }}</strong> avec succès. 🎉</p>
         <p>Votre compte a été mis à jour en conséquence, et vous pouvez désormais utiliser ces fonds. Veuillez accéder à votre tableau de bord sur l'application <strong>Ecochamp</strong> pour initier un retrait.</p>
         <p>Si vous avez des questions ou des préoccupations, n’hésitez pas à nous contacter à <a href="mailto:support@ecochamp.org">support@ecochamp.org</a></p>
         <p>Merci pour votre implication en tant qu'<strong>eco-citoyen</strong> 🎉</p>

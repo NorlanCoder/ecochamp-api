@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Notifications\InscriptionNotification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -12,6 +13,8 @@ use Laravel\Socialite\Facades\Socialite;
 use App\Notifications\ResetPasswordNotification;
 use Ichtrojan\Otp\Models\Otp as Model;
 use Ichtrojan\Otp\Otp;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 
 class AuthController extends Controller
 {
@@ -112,6 +115,18 @@ class AuthController extends Controller
             'address' => $request->rccm ? $request->rccm : null,
         ]);
 
+        // Envoi de la notification par email
+        try {
+            Notification::send($user, new InscriptionNotification($user));
+        } catch (\Throwable $th) {
+            // Enregistrement de l'erreur dans les logs
+            Log::error('Échec de l\'envoi de la notification.', [
+                'user_id' => $user->id ?? null,
+                'email' => $user->email ?? 'Adresse email non spécifiée',
+                'exception_message' => $th->getMessage(),
+                'trace' => $th->getTraceAsString()
+            ]);
+        }
 
         return response()->json([
             'status' => true,
@@ -302,7 +317,19 @@ class AuthController extends Controller
             ]);
         }
         // $user->notify(new ResetPasswordNotification());
-        $otp = $this->otp->generate($user->email, 'numeric', 5, 15);
+        // Envoi de la notification par email
+        try {
+            Notification::send($user, new ResetPasswordNotification($user));
+        } catch (\Throwable $th) {
+            // Enregistrement de l'erreur dans les logs
+            $otp = $this->otp->generate($user->email, 'numeric', 5, 15);
+            Log::error('Échec de l\'envoi de la notification.', [
+                'user_id' => $user->id ?? null,
+                'email' => $user->email ?? 'Adresse email non spécifiée',
+                'exception_message' => $th->getMessage(),
+                'trace' => $th->getTraceAsString()
+            ]);
+        }
         
         return response()->json([
             'message' =>'Nous avons envoyé un code dans votre boite mail.',
@@ -339,6 +366,19 @@ class AuthController extends Controller
         $user = User::firstWhere('email', $request->email);
 
         $user->update($request->only('password'));
+
+        // Envoi de la notification par email
+        try {
+            Notification::send($user, new ResetPasswordNotification($user));
+        } catch (\Throwable $th) {
+            // Enregistrement de l'erreur dans les logs
+            Log::error('Échec de l\'envoi de la notification.', [
+                'user_id' => $user->id ?? null,
+                'email' => $user->email ?? 'Adresse email non spécifiée',
+                'exception_message' => $th->getMessage(),
+                'trace' => $th->getTraceAsString()
+            ]);
+        }
 
         return response()->json([
             'status' => true,

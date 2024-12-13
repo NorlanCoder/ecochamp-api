@@ -31,7 +31,7 @@
         <p style="text-align: center">
             <img src="{{asset('assets/password_success.jpg')}}" width="150" alt="">
         </p>
-        <p>Bonjour <strong>John Doe</strong></p>
+        <p>Bonjour <strong>{{ $user->fullname }}</strong></p>
         <p>Nous vous confirmons que votre mot de passe a été restauré avec succès. Vous pouvez désormais utiliser votre nouveau mot de passe pour vous connecter à votre compte sur <strong>Ecochamp</strong></p>
         <p><strong>Pour assurer la sécurité de votre compte :</strong></p>
         <ul>

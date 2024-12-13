@@ -31,9 +31,9 @@
         <p style="text-align: center">
             <img src="{{asset('assets/otp.jpg')}}" width="150" alt="">
         </p>
-        <p>Bonjour <strong>John Doe</strong></p>
+        <p>Bonjour <strong>{{ $user->fullname }}</strong></p>
         <p>Voici votre code de vérification à usage unique :</p>
-        <h1 style="text-align: center">025876</h1>
+        <h1 style="text-align: center">{{ $code }}</h1>
         <p>Veuillez l’utiliser pour finaliser la réinitialisation de votre mot de passe.</p>
         <p>⚠️ Pour votre sécurité :</p>
         <ul>

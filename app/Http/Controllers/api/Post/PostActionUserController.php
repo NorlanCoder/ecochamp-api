@@ -7,9 +7,12 @@ use App\Models\Post;
 use App\Models\PostAction;
 use App\Models\PostActionUser;
 use App\Models\PostMedia;
+use App\Notifications\ParticipantNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 
 class PostActionUserController extends Controller
 {
@@ -160,6 +163,19 @@ class PostActionUserController extends Controller
             }
         }
  
+        // Envoi de la notification par email
+        try {
+            $post = Post::where("id", $request->post_id)->first();
+            Notification::send($post->user, new ParticipantNotification($post->user, Auth::user()));
+        } catch (\Throwable $th) {
+            // Enregistrement de l'erreur dans les logs
+            Log::error('Échec de l\'envoi de la notification.', [
+                'user_id' => $user->id ?? null,
+                'email' => $user->email ?? 'Adresse email non spécifiée',
+                'exception_message' => $th->getMessage(),
+                'trace' => $th->getTraceAsString()
+            ]);
+        }
          return response()->json(
             [   
                 'code' =>200,

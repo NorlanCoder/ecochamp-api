@@ -3,25 +3,25 @@
 namespace App\Notifications;
 
 use App\Models\User;
-use Ichtrojan\Otp\Otp;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class ResetPasswordNotification extends Notification
+class ParticipantNotification extends Notification
 {
     use Queueable;
+
     private User $user;
-    private $otp;
+    private User $participant;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(User $user)
+    public function __construct(User $user, User $participant)
     {
         $this->user = $user;
-        $this->otp = new Otp();
+        $this->participant = $participant;
     }
 
     /**
@@ -39,10 +39,8 @@ class ResetPasswordNotification extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $otp = $this->otp->generate($notifiable->email, 'numeric', 5, 15);
-
         return (new MailMessage)
-            ->view('emails.forgotpassword', ['user' => $this->user, 'code' => $otp->token]);
+            ->view('emails.interet', ['user' => $this->user, 'participant' => $this->participant]);
     }
 
     /**

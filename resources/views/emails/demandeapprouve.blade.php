@@ -31,7 +31,7 @@
         <p style="text-align: center">
             <img src="{{asset('assets/financement.png')}}" width="100" alt="">
         </p>
-        <p>Bonjour <strong>John Doe</strong></p>
+        <p>Bonjour <strong>{{ $user->fullname }}</strong></p>
         <p>Nous vous informons que votre demande de retrait a été approuvée et est actuellement en cours de traitement.</p>
         <p>Les fonds seront transférés vers votre compte mobile money sous un délai de <strong>4h</strong>.</p>
         <p><strong>👉 Vous pouvez consulter l’état de votre transaction à tout moment via votre tableau de bord</strong></p>

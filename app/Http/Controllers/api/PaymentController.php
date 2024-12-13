@@ -9,10 +9,13 @@ use App\Models\Post;
 use App\Models\PostPayment;
 use App\Models\User;
 use App\Models\WithdrawRequest;
+use App\Notifications\FinancementNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 
 class PaymentController extends Controller
 {
@@ -73,6 +76,19 @@ class PaymentController extends Controller
                 ]); 
             }
             DB::commit();
+
+            // Envoi de la notification par email
+            try {
+                Notification::send($post->user, new FinancementNotification($post->user, $payement->amount));
+            } catch (\Throwable $th) {
+                // Enregistrement de l'erreur dans les logs
+                Log::error('Échec de l\'envoi de la notification.', [
+                    'user_id' => $user->id ?? null,
+                    'email' => $user->email ?? 'Adresse email non spécifiée',
+                    'exception_message' => $th->getMessage(),
+                    'trace' => $th->getTraceAsString()
+                ]);
+            }
 
             return response()->json([
                     'data' => $payement,

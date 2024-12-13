@@ -31,12 +31,12 @@
         <p style="text-align: center">
             <img src="{{asset('assets/interet.png')}}" width="100" alt="">
         </p>
-        <p>Bonjour <strong>John Doe</strong></p>
+        <p>Bonjour <strong>{{ $user->fullname }}</strong></p>
         <p>Nous avons le plaisir de vous informer qu’une nouvelle personne a manifesté de l’intérêt pour votre événement en tant que <strong>Bénévole</strong></p>
         <p>Détails de la personne intéressée :</p>
         <ul>
-            <li><strong>Nom:</strong> John Doe</li>
-            <li><strong>Adresse e-mail:</strong> mail@gmail.com</li>
+            <li><strong>Nom:</strong> {{ $participant->fullname }}</li>
+            <li><strong>Adresse e-mail:</strong> {{ $participant->email }}</li>
         </ul>
         <p>Nous vous invitons à entrer en contact avec cette personne pour lui fournir des informations complémentaires ou confirmer son inscription/engagement.</p>
         <p><strong>👉 Consultez les détails complets de votre événement sur votre tableau de bord</strong></p>
