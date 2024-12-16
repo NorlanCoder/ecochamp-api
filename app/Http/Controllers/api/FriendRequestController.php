@@ -33,17 +33,21 @@ class FriendRequestController extends Controller
             ]);
         }
 
-        FriendRequest::create([
+        $friend = FriendRequest::create([
             'sender_id' => auth()->id(),
             'receiver_id' => $request->receiverId,
             'status' => 'pending',
         ]);
 
+        $requestFriend = FriendRequest::where('id', $friend->id)->with('sender')
+        ->with('receiver')->first();
+
         return response()->json(
             [
                 'success' => true,
                 'code' => 200,
-                'message' => 'Demande envoyée.'
+                'message' => 'Demande envoyée.',
+                'data' => $requestFriend
             ]);
     }
 
@@ -81,12 +85,32 @@ class FriendRequestController extends Controller
     }
 
     /**
-     * Liste des reponse d'ami en attente
+     * Liste des requeste d'ami en attente recu
      */
     public function getFriendRequests()
     {
         $user = User::where('id', Auth::user()->id)->first();
         $requests = $user->receivedFriendRequests()->where('status', 'pending')
+            ->with('sender')
+            ->with('receiver')
+            // ->orderBy('fullname')
+            ->get();
+        return response()->json(
+            [
+                'success' => true,
+                'code' => 200,
+                'message' => 'liste amis en attente',
+                'data' => $requests
+            ]);
+    }
+
+     /**
+     * Liste des requeste d'ami en attente envoyé
+     */
+    public function sentFriendRequests()
+    {
+        $user = User::where('id', Auth::user()->id)->first();
+        $requests = $user->sentFriendRequests()->where('status', 'pending')
             ->with('sender')
             ->with('receiver')
             // ->orderBy('fullname')

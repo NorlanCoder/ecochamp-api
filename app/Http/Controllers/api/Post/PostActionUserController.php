@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\api\Post;
 
+use App\Enums\NotificationType;
 use App\Http\Controllers\Controller;
 use App\Models\Post;
 use App\Models\PostAction;
 use App\Models\PostActionUser;
 use App\Models\PostMedia;
 use App\Notifications\ParticipantNotification;
+use App\Notifications\UserNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -166,6 +168,8 @@ class PostActionUserController extends Controller
         // Envoi de la notification par email
         try {
             $post = Post::where("id", $request->post_id)->first();
+            $post->user->notify(new UserNotification(NotificationType::Action, 'Vous avez un nouveau participant à votre événement.', Auth::user()->fullname, $post->id));
+
             Notification::send($post->user, new ParticipantNotification($post->user, Auth::user()));
         } catch (\Throwable $th) {
             // Enregistrement de l'erreur dans les logs

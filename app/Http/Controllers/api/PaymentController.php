@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\api;
 
+use App\Enums\NotificationType;
 use App\Enums\RetraitEnum;
 use App\Http\Controllers\Controller;
 use App\Models\Account;
@@ -10,6 +11,7 @@ use App\Models\PostPayment;
 use App\Models\User;
 use App\Models\WithdrawRequest;
 use App\Notifications\FinancementNotification;
+use App\Notifications\UserNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -79,6 +81,8 @@ class PaymentController extends Controller
 
             // Envoi de la notification par email
             try {
+                $post->user->notify(new UserNotification(NotificationType::Don, 'Vous avez reçu un nouveau financement pour votre événement.', Auth::user()->fullname, $post->id));
+
                 Notification::send($post->user, new FinancementNotification($post->user, $payement->amount));
             } catch (\Throwable $th) {
                 // Enregistrement de l'erreur dans les logs

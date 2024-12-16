@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Illuminate\Pagination\LengthAwarePaginator; 
+use Illuminate\Pagination\Paginator;
 
 
 class UserController extends Controller
@@ -124,7 +126,8 @@ class UserController extends Controller
                 'phone_number' => ['required', 'string'],
                 'country' => ['required', 'string', 'max:255'],
                 'city' => ['required', 'string', 'max:255'],
-                'gender' => ['required', 'string', 'max:255']
+                'gender' => ['required', 'string', 'max:255'],
+                'ifu' => ['required', 'string', 'max:255']
 
             ]);
 
@@ -143,6 +146,7 @@ class UserController extends Controller
                 'country' => $request->country,
                 'city' => $request->city,
                 'gender' => $request->gender,
+                'ifu' => $request->ifu ?? $user->ifu,
             ]);
 
             return response()->json([
@@ -243,50 +247,69 @@ class UserController extends Controller
         ]);
     }
 
-       /**
+    /**
      * Notification Listes user
      */
     public function notify_user(Request $request)
     {
-        
         $user = User::where('id', Auth::user()->id)->first();
 
-        $notifications = $user->notifications;
-
-        $settings = $user->notificationSettings ? json_decode($user->notificationSettings) : [
+        $settings = $user->notificationSettings ? json_decode($user->notificationSettings) : (object)[
             'comment' => true,
             'reaction' => true,
             'share' => true,
             'participate' => true,
+            'financement' => true,
             'message' => true
         ];
 
-        $filteredNotifications = $notifications->filter(function ($notification) use ($settings) {
-            $type = $notification->data['type'];
-            // Log::info(['type' => $settings->reaction]);
-            if ($type == 'love' && !$settings->reaction) {
-                return false; 
-            }
-            if ($type == $settings->comment . 'ed' && !$settings->comment) {
-                return false; 
-            }
-            if ($type == $settings->share . 'ed' && !$settings->share) {
-                return false; 
-            }
-            if ($type == $settings->participate && !$settings->participate) {
-                return false; 
-            }
-            if ($type == $settings->message && !$settings->message) {
-                return false; 
-            }
-            return true; 
+        $notifications = $user->notifications->sortByDesc(function ($notification) {
+            return $notification->created_at ?? $notification->updated_at;
         });
+
+        // Filtre des notifications en fonction des paramètres
+        $notifications = $notifications->filter(function ($notification) use ($settings) {
+            $type = $notification->data['type'];
+            if ($type == 'love' && !$settings->reaction) return false;
+            if (isset($settings->comment) && $type == $settings->comment . 'ed' && !$settings->comment) return false;
+            if (isset($settings->share) && $type == $settings->share . 'ed' && !$settings->share) return false;
+            if (isset($settings->participate) && $type == $settings->participate && !$settings->participate) return false;
+            if (isset($settings->message) && $type == $settings->message && !$settings->message) return false;
+            if (isset($settings->financement) && $type == $settings->financement && !$settings->financement) return false;
+            return true;
+        });
+
+        // Convertir la collection filtrée en un tableau pour la pagination
+        $notificationsArray = $notifications->values()->all();
+
+        // Définir la pagination
+        $perPage = $request->input('per_page', 10);
+        $currentPage = Paginator::resolveCurrentPage('page');
+
+        // Pagination des notifications filtrées
+        $currentPageItems = array_slice($notificationsArray, ($currentPage - 1) * $perPage, $perPage);
+        $paginatedNotifications = new LengthAwarePaginator(
+            $currentPageItems, 
+            count($notificationsArray), 
+            $perPage, 
+            $currentPage, 
+            [
+                'path' => Paginator::resolveCurrentPath(),
+                'pageName' => 'page',
+            ]
+        );
 
         return response()->json([
             'success' => true,
             'code' => 200,
-            'message' => 'les notifications',
-            'data' => $filteredNotifications
+            'message' => 'Les notifications',
+            'data' => $paginatedNotifications->toArray(),
+            'pagination' => [
+                'current_page' => $paginatedNotifications->currentPage(),
+                'last_page' => $paginatedNotifications->lastPage(),
+                'per_page' => $paginatedNotifications->perPage(),
+                'total' => $paginatedNotifications->total(),
+            ]
         ]);
     }
 
@@ -326,7 +349,9 @@ class UserController extends Controller
             'comment' => true,
             'reaction' => true,
             'share' => true,
-            'participate' => true
+            'participate' => true,
+            'financement' => true,
+            'message' => true
         ];
         
         $notificationSettings[$request->type] = $request->value;
