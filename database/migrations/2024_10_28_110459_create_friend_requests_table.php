@@ -20,6 +20,7 @@ return new class extends Migration
         });
         Schema::table('users', function (Blueprint $table) {
             $table->string('account_type')->default('individual');
+            $table->enum('role', ['ativist', 'admin'])->default('ativist');
             $table->boolean('verify')->default(false);
         });
     }

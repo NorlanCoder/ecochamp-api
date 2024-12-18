@@ -71,11 +71,11 @@ class FriendRequestController extends Controller
                 'sender_id' => $friendRequest->sender_id,
                 'receiver_id' => $friendRequest->receiver_id,
             ]);
+            $friendRequest->save();
         } elseif ($action == 'decline') {
-            $friendRequest->status = 'declined';
+            $friendRequest->delete();
         }
 
-        $friendRequest->save();
         return response()->json(
             [
                 'success' => true,

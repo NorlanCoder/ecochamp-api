@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
+use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Laravel\Firebase\Facades\Firebase;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
 class PostActionUserController extends Controller
 {
@@ -170,7 +173,21 @@ class PostActionUserController extends Controller
            
             $post = Post::where("id", $request->post_id)->first();
             $post->user->notify(new UserNotification(NotificationType::Action, 'Vous avez un nouveau participant à votre événement.', Auth::user()->fullname, $post->id));
-
+            try {
+                $message = CloudMessage::new()
+                            ->toToken(Auth::user()->token_notify)
+                            ->withNotification([
+                                'title' => 'Notification de participation',
+                                'body' => 'Vous avez un nouveau participant à votre événement.',
+                            ]);
+                            // ->withData([
+                            //     'id' => $notification->id,
+                            // ]);
+                Firebase::messaging()->send($message);
+            } catch (\Exception $e) {
+                // Handle exceptions here
+                Log::error('Error sending notification: ' . $e->getMessage());
+            }
             Notification::send($post->user, new ParticipantNotification($post->user, Auth::user()));
         } catch (\Throwable $th) {
             // Enregistrement de l'erreur dans les logs
