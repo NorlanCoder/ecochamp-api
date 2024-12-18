@@ -14,6 +14,7 @@ use App\Http\Requests\Reaction\AddCommentReactionRequest;
 use App\Models\Comment;
 use App\Models\CommentReaction;
 use App\Notifications\UserNotification;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -64,13 +65,13 @@ class PostCommentsController extends Controller
         
             $comment = $post->comments()->create([
                 'content' => $request->content,
-                'user_id' => auth()->user()->id,
+                'user_id' => Auth::user()->id,
             ]);
         
             $post->user->notify(new UserNotification(
                 NotificationType::Comment,
                 'Un nouveau commentaire pour votre post.',
-                auth()->user()->fullname,
+                Auth::user()->fullname,
                 $request->post_id
             ));
         
@@ -90,7 +91,7 @@ class PostCommentsController extends Controller
         try {
             $comment = $this->comment->find($request->comment_id);
 
-            if ($comment->user_id !== auth()->user()->id) {
+            if ($comment->user_id !== Auth::user()->id) {
                 return response()->json(['message' => 'unauthorised']);
             }
 
@@ -140,7 +141,7 @@ class PostCommentsController extends Controller
             $comment->reactions->create(
                 [
                     'reaction_id' => $request->get('reaction_id'),
-                    'user_id' => auth()->user()->id,
+                    'user_id' => Auth::user()->id,
                     'post_id' => $comment->post_id
                 ]
             );
@@ -162,7 +163,7 @@ class PostCommentsController extends Controller
     {
         try {
             $comment = $this->comment->find($request->get('comment_id'));
-            if ($comment && $comment->user_id != auth()->user()->id) {
+            if ($comment && $comment->user_id != Auth::user()->id) {
                 return response()->json([
                     'message' => 'unauthorised'
                 ]);
@@ -193,11 +194,11 @@ class PostCommentsController extends Controller
 
         $comment = $this->comment->find($request->get('comment_id'));
 
-        if ($comment && $comment->user_id != auth()->user()->id) {
+        if ($comment && $comment->user_id != Auth::user()->id) {
             return response()->json(['message' => 'authorised']);
         }
 
-        $this->comment_reaction->where('user_id', auth()->user()->id)->where('post_id', $comment->post_id)->delete();
+        $this->comment_reaction->where('user_id', Auth::user()->id)->where('post_id', $comment->post_id)->delete();
 
         return response()->json([
             'success' => true,

@@ -167,6 +167,7 @@ class PostActionUserController extends Controller
  
         // Envoi de la notification par email
         try {
+           
             $post = Post::where("id", $request->post_id)->first();
             $post->user->notify(new UserNotification(NotificationType::Action, 'Vous avez un nouveau participant à votre événement.', Auth::user()->fullname, $post->id));
 

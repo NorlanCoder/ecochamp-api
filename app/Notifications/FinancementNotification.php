@@ -7,6 +7,9 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Log;
+use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Laravel\Firebase\Facades\Firebase;
 
 class FinancementNotification extends Notification
 {
@@ -38,6 +41,23 @@ class FinancementNotification extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
+        try {
+            $message = CloudMessage::new()
+                        ->toToken($this->user->token_notify)
+                        ->withNotification([
+                            'title' => 'Notification de financement',
+                            'body' => 'Vous avez reçu un nouveau financement pour votre événement.',
+                        ]);
+                        // ->withData([
+                        //     'id' => $notification->id,
+                        // ]);
+            Firebase::messaging()->send($message);
+        } catch (\Exception $e) {
+            // Handle exceptions here
+            Log::error('Error sending notification: ' . $e->getMessage());
+            // Or throw a custom exception
+            // throw new \RuntimeException('Failed to send notification', 0, $e);
+        }
         return (new MailMessage)
             ->view('emails.financementrecu', ['user' => $this->user, 'montant' => $this->montant]);
     }

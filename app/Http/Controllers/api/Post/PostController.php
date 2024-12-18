@@ -22,6 +22,7 @@ use App\Models\PostReaction;
 use App\Models\PostShare;
 use App\Models\Tag;
 use App\Notifications\UserNotification;
+use App\Service\NotificationService;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Http\Request;
 use Illuminate\Log\Logger;
@@ -66,8 +67,8 @@ class PostController extends Controller
 
             // Récupération de l'état de la demande d'amis
             $friendRequest = FriendRequest::where(function($query) {
-                $query->where('sender_id', auth()->id())
-                      ->orWhere('receiver_id', auth()->id());
+                $query->where('sender_id', auth::id())
+                      ->orWhere('receiver_id', auth::id());
             })->where(function($query) {
                 $query->where('sender_id', $this->user->id)
                       ->orWhere('receiver_id', $this->user->id);
@@ -192,6 +193,7 @@ class PostController extends Controller
     public function getAllAlerte(Request $request)
     {
         $post = Post::where('type', PostType::Alerte)
+        ->where('active', true)
         ->with('user')
         ->with('comments')
         ->with('tags')
@@ -351,7 +353,7 @@ class PostController extends Controller
      */
     public function getAlertEvennement(Request $request)      
     {
-        $post = Post::with('user')
+        $post = Post::where('active', true)->with('user')
         ->with('comments')
         ->with('tags')
         ->with('postActions')
@@ -630,7 +632,6 @@ class PostController extends Controller
             'inscription_url'      => isset($request->inscription_url)? $request->inscription_url : null,
             'city'      => isset($request->city)? $request->city : null,
             'address'      => isset($request->address)? $request->address : null,
-            
 
         ]);
         if ($request->tags){
@@ -660,14 +661,19 @@ class PostController extends Controller
             }
         }
         if($request->actions){
-
+           
             foreach ($request->actions as $action) {
                 $post_action = DB::table('post_actions')->insert([
                     'post_id' => $post->id,
                     'action_id' => intval($action),
                 ]);
-                // $post->actions()->attach(intval($action));
             }
+            $notify = new NotificationService($post);
+            $notify->pushNotifyEvent();
+        }
+        if($post->type == PostType::Alerte){
+            $notify = new NotificationService($post);
+            $notify->pushNotifyAlert();
         }
         return response()->json([
             'status' => 'sucess',

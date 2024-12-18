@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('rccm')->nullable();
             $table->string('publication_journal')->nullable();
             $table->string('address')->nullable();
+            $table->string('token_notify')->nullable();
         
         });
 
@@ -36,6 +37,7 @@ return new class extends Migration
             $table->dropIfExists('rccm');
             $table->dropIfExists('publication_journal');
             $table->dropIfExists('address');
+            $table->dropIfExists('token_notify');
         });
         Schema::table('messages', function (Blueprint $table) {
             $table->dropIfExists('images');

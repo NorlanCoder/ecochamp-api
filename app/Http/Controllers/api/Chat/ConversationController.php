@@ -137,8 +137,8 @@ class ConversationController extends Controller
         $user = Auth::user();
 
         $listchat = Chat::where(function($query) {
-            $query->where('sender_id', auth()->id())
-                  ->orWhere('receiver_id', auth()->id());
+            $query->where('sender_id', auth::id())
+                  ->orWhere('receiver_id', auth::id());
                 })
                 ->orderBy('id','desc')
                 ->get();

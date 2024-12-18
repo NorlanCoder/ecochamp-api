@@ -100,6 +100,8 @@ Route::middleware(['auth:sanctum', 'online'])->group(function () {
     Route::post('user/posts', [PostController::class, 'getUserPost']);
 
     Route::get('user/notification', [UserController::class, 'notify_user']);
+    Route::get('refresh/token/push/notify', [UserController::class, 'refresh_token_notify']);
+    
     Route::post('user/notification/markasread', [UserController::class,'markAsRead']);
     Route::post('user/notification/settings', [UserController::class,'notificationSettings']);
     Route::get('user/info', [UserController::class,'infoUser']);

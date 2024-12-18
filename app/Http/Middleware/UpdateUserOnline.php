@@ -19,7 +19,7 @@ class UpdateUserOnline
     public function handle($request, Closure $next)
     {
         if (Auth::check()) {
-            $user = User::where('id', auth()->user()->id)->first();
+            $user = User::where('id', auth::user()->id)->first();
             $user->update(['online' => now()]);
 
             event(new UserOnligne(Auth::user()));

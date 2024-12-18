@@ -21,20 +21,20 @@ class FriendRequestController extends Controller
             'receiverId' => 'required'
         ]);
 
-        $verify = FriendRequest::where('sender_id', auth()->id())->where('receiver_id', $request->receiverId)->exists()
-                    || FriendRequest::where('receiver_id', auth()->id())->where('sender_id', $request->receiverId)->exists();
+        $verify = FriendRequest::where('sender_id', Auth::id())->where('receiver_id', $request->receiverId)->exists()
+                    || FriendRequest::where('receiver_id', Auth::id())->where('sender_id', $request->receiverId)->exists();
         if ($verify)
         {
             return response()->json(
                 [
                     'success' => true,
-                    'code' => 400,
-                    'message' => 'Demande déjà envoyée.',
+                    'code' => 205,
+                    'message' => 'Demande déjà envoyée.', 
             ]);
         }
 
         $friend = FriendRequest::create([
-            'sender_id' => auth()->id(),
+            'sender_id' => Auth::id(),
             'receiver_id' => $request->receiverId,
             'status' => 'pending',
         ]);
@@ -130,8 +130,8 @@ class FriendRequestController extends Controller
     public function getFriendsList()
     {
         $friends = FriendRequest::where(function($query) {
-            $query->where('sender_id', auth()->id())
-                  ->orWhere('receiver_id', auth()->id())
+            $query->where('sender_id', Auth::id())
+                  ->orWhere('receiver_id', Auth::id())
         ->distinct()
         ;
         })
@@ -140,18 +140,18 @@ class FriendRequestController extends Controller
         ->distinct()
         ->get()
         ->map(function($friendRequest) {
-            return $friendRequest->sender_id == auth()->id()
+            return $friendRequest->sender_id == Auth::id()
                 ? $friendRequest->receiver
                 : $friendRequest->sender;
         });
 
         $friends = $friends->transform(function($user) {
             $friendRequest = FriendRequest::where(function($query) use ($user) {
-                                $query->where('sender_id', auth()->id())
+                                $query->where('sender_id', Auth::id())
                                     ->where('receiver_id', $user->id);
                             })
                             ->orWhere(function($query) use ($user) {
-                                $query->where('receiver_id', auth()->id())
+                                $query->where('receiver_id', Auth::id())
                                     ->where('sender_id', $user->id);
                             })
                             ->first();
@@ -176,8 +176,8 @@ class FriendRequestController extends Controller
     public function getSuggestion()
     {
         $friend_ids = FriendRequest::where(function($query) {
-            $query->where('sender_id', auth()->id())
-                  ->orWhere('receiver_id', auth()->id());
+            $query->where('sender_id', Auth::id())
+                  ->orWhere('receiver_id', Auth::id());
             })
             ->whereIn('status', ['accepted', 'pending']) // Utilise whereIn pour les deux statuts
             ->get(['sender_id', 'receiver_id']) // Récupère les deux colonnes en même temps
@@ -193,16 +193,16 @@ class FriendRequestController extends Controller
                             ->orWhere('city', 'like', '%' . Auth::user()->city . '%');
                     })
                     ->whereNotIn('id', $friend_ids)
-                    ->where('id', '!=', auth()->id())
+                    ->where('id', '!=', Auth::id())
                     ->get();
 
             $suggfriends = $suggfriends->transform(function($user) {
                     $friendRequest = FriendRequest::where(function($query) use ($user) {
-                                        $query->where('sender_id', auth()->id())
+                                        $query->where('sender_id', Auth::id())
                                             ->where('receiver_id', $user->id);
                                     })
                                     ->orWhere(function($query) use ($user) {
-                                        $query->where('receiver_id', auth()->id())
+                                        $query->where('receiver_id', Auth::id())
                                             ->where('sender_id', $user->id);
                                     })
                                     ->first();

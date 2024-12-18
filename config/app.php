@@ -130,7 +130,7 @@ return [
  
         Ichtrojan\Otp\OtpServiceProvider::class,
         Laravel\Socialite\SocialiteServiceProvider::class,
-        Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
+        // Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
 
     ])->toArray(),

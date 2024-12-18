@@ -383,7 +383,7 @@ class UserController extends Controller
                 'errors' => $validator->errors()
             ]);
         }
-        $notification = auth()->user()->unreadNotifications->find($request->id);
+        $notification = Auth::user()->unreadNotifications->find($request->id);
         if ($notification) {
             $notification->markAsRead();
         }
@@ -412,6 +412,47 @@ class UserController extends Controller
             'message' => 'ville',
             'data' => $cities
         ]);
+    }
+
+    /**
+     * Refresh Push Token
+     * 
+     * @param Request $request
+     */
+    public function refresh_token_notify(Request $request){
+        try {
+
+            $validateUser = Validator::make($request->all(), 
+            [
+                'token' => 'required',
+
+            ]);
+
+            if($validateUser->fails()){
+                return response()->json([
+                    'status' => false,
+                    'message' => 'validation error',
+                    'errors' => $validateUser->errors()
+                ], 401);
+            }
+
+            $user = User::where('id', Auth::user()->id)->first();
+            $user->update([
+                'token_notify' => $request->token,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'code' => 200,
+                'message' => 'la notification',
+                'data' => $user
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => $th->getMessage()
+            ], 500);
+        }
     }
 
 }
