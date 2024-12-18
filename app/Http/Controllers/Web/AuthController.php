@@ -68,10 +68,9 @@ class AuthController extends Controller
 
 
     public function dashboard(){
+        $user = Auth::user();
 
-        // Auth::logout();
-
-        return redirect()->route('web.login');
+        return view('dashboard.home', compact(['user']));
     }
 
 
