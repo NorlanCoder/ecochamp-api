@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Web\AuthController;
+use App\Http\Controllers\Web\ParticipationController;
+use App\Http\Controllers\Web\RetraitController;
 use App\Http\Controllers\Web\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,6 +22,19 @@ Route::middleware(['web_dashboard'])->group(function () {
         Route::post('admin/create', 'store')->name('web.admin.store');
         Route::put('admin/update/{user}', 'update')->name('web.admin.update');
         Route::get('admin/delete/{user}', 'destroy')->name('web.admin.delete');
+    });
+
+    Route::controller(ParticipationController::class)->group(function () {
+        Route::get('financement/index', 'financement')->name('web.financement.index'); 
+        Route::get('participation/index', 'participation')->name('web.participation.index'); 
+        Route::get('benevolat/index', 'benevolat')->name('web.benevolat.index'); 
+       
+    });
+
+    Route::controller(RetraitController::class)->group(function () {
+        Route::get('retrait/index', 'index')->name('web.retrait.index'); 
+        Route::get('retrait/demande/{demande?}', 'demande')->name('web.retrait.demande'); 
+        
     });
 
 

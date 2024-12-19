@@ -95,7 +95,7 @@
 						<div class="menu-title">Retrait</div>
 					</a>
 					<ul>
-						<li> <a href="content-grid-system.html"><i class='bx bx-radio-circle'></i>Demande de Retrait</a>
+						<li> <a href="{{route('web.retrait.index')}}"><i class='bx bx-radio-circle'></i>Demande de Retrait</a>
 						</li>
 					</ul>
 				</li>
@@ -416,6 +416,14 @@
     <script>
        $(".data-attributes span").peity("donut")
     </script>
+	<script>
+		$(document).ready(function() {
+			$('#menu').metisMenu();
+			// Pour ouvrir un sous-menu spécifique à l'ouverture de la page
+			// $('#menu li:has(a[href="javascript:;"])').eq(1).addClass('mm-active');
+			// $('#menu li:has(a[href="javascript:;"])').eq(1).find('ul').first().addClass('mm-show');
+		});
+	</script>
 </body>
 
 

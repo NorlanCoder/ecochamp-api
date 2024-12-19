@@ -2464,3 +2464,11 @@ input::placeholder {
     display: none;
   }
 }/*# sourceMappingURL=app.css.map */
+
+
+.metismenu .has-arrow::after {
+  transition: transform 0.3s ease-in-out;
+}
+.metismenu li.active > .has-arrow::after {
+  transform: rotate(90deg);
+}
