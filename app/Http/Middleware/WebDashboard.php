@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class WebMiddleware
+class WebDashboard
 {
     /**
      * Handle an incoming request.
@@ -16,9 +16,10 @@ class WebMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!Auth::check()) {
-            return to_route('web.login');
-        }
+
+        if(!Auth::user())
+            return to_route('web.login')->with('danger',"Veuillez vous connecter.");
+
         return $next($request);
     }
 }

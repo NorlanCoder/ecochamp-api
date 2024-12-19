@@ -7,7 +7,7 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<!--favicon-->
-	<link rel="icon" href="{asset('assets/images/favicon.png')}" type="image">
+	<link rel="icon" href="{{asset('assets/images/favicon.png')}}" type="image">
 	<!--plugins-->
 	<link href="{{asset('assets/plugins/vectormap/jquery-jvectormap-2.0.2.css')}}" rel="stylesheet">
 	<link href="{{asset('assets/plugins/simplebar/css/simplebar.css')}}" rel="stylesheet">
@@ -23,7 +23,7 @@
 	
 	<link href="{{asset('assets/sass/app.css')}}" rel="stylesheet">
 	<link href="{{asset('assets/css/icons.css')}}" rel="stylesheet">
-	<link href='../../../../unpkg.com/boxicons%402.1.4/css/boxicons.min.css' rel='stylesheet'>
+	<link href="{{asset('assets/css/boxicons.min.css')}}" rel='stylesheet'>
 	<!-- Theme Style CSS -->
 	<link rel="stylesheet" href="{{asset('assets/sass/dark-theme.css')}}">
 	<link rel="stylesheet" href="{{asset('assets/sass/semi-dark.css')}}">
@@ -42,7 +42,7 @@
 					<img src="{{asset('assets/images/logo-icon.png')}}" class="logo-icon" alt="logo icon">
 				</div>
 				<div>
-					<h4 class="logo-text">Syndron</h4>
+					<h4 class="logo-text">Ecochamp</h4>
 				</div>
 				<div class="mobile-toggle-icon ms-auto"><i class='bx bx-x'></i>
 				</div>
@@ -50,11 +50,10 @@
 			<!--navigation-->
 			<ul class="metismenu" id="menu">
 				<li>
-					<a href="javascript:;" class="has-arrow">
+					<a href="{{route('web.dashboard')}}" class="has-arrow">
 						<div class="parent-icon"><i class='bx bx-home-alt'></i>
 						</div>
-						<div class="menu-title">
-                            <a href="index-2.html"><i class='bx bx-radio-circle'></i>Dashboard</a>  
+						<div class="menu-title">Dashboard
                         </div>
 					</a>
 				</li>
@@ -65,11 +64,11 @@
 						<div class="menu-title">Utilisateurs</div>
 					</a>
 					<ul>
-						<li> <a href="app-emailbox.html"><i class='bx bx-radio-circle'></i>Utilisateurs</a>
+						<li> <a href="{{route('web.user.index')}}"><i class='bx bx-radio-circle'></i>Utilisateurs</a>
 						</li>
-						<li> <a href="app-chat-box.html"><i class='bx bx-radio-circle'></i>ONG</a>
+						<li> <a href="{{route('web.ong.index')}}"><i class='bx bx-radio-circle'></i>ONG</a>
 						</li>
-						<li> <a href="app-file-manager.html"><i class='bx bx-radio-circle'></i>Admin</a>
+						<li> <a href="{{route('web.admin.index')}}"><i class='bx bx-radio-circle'></i>Admin</a>
 						</li>
 					</ul>
 				</li>
@@ -81,9 +80,11 @@
 						<div class="menu-title">Participation</div>
 					</a>
 					<ul>
-						<li> <a href="component-alerts.html"><i class='bx bx-radio-circle'></i>Financement</a>
+						<li> <a href="{{route('web.financement.index')}}"><i class='bx bx-radio-circle'></i>Financement</a>
 						</li>
-						<li> <a href="component-accordions.html"><i class='bx bx-radio-circle'></i>Benovolat</a>
+						<li> <a href="{{route('web.participation.index')}}"><i class='bx bx-radio-circle'></i>Participation</a>
+						</li>
+						<li> <a href="{{route('web.benevolat.index')}}"><i class='bx bx-radio-circle'></i>Bénevolat</a>
 						</li>
 					</ul>
 				</li>
@@ -120,10 +121,10 @@
 								</a>
 							</li>
 							
-							<li class="nav-item dark-mode d-none d-sm-flex">
+							<!-- <li class="nav-item dark-mode d-none d-sm-flex">
 								<a class="nav-link dark-mode-icon" href="javascript:;"><i class='bx bx-moon'></i>
 								</a>
-							</li>
+							</li> -->
 
 							<li class="nav-item dropdown dropdown-large">
 								<a class="nav-link dropdown-toggle dropdown-toggle-nocaret position-relative" href="#" data-bs-toggle="dropdown"><span class="alert-count">7</span>
@@ -255,16 +256,16 @@
 					</div>
 					<div class="user-box dropdown px-3">
 						<a class="d-flex align-items-center nav-link dropdown-toggle gap-3 dropdown-toggle-nocaret" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-							<img src="assets/images/avatars/avatar-2.png" class="user-img" alt="user avatar">
+							<img src="{{asset($user->url_profil ?? 'assets/images/profile.png')}}" class="user-img" alt="user avatar">
 							<div class="user-info">
 								<p class="user-name mb-0">{{$user->fullname}}</p>
 								<!-- <p class="designattion mb-0">Web Designer</p> -->
 							</div>
 						</a>
 						<ul class="dropdown-menu dropdown-menu-end">
-							<li><a class="dropdown-item d-flex align-items-center" href="javascript:;"><i class="bx bx-user fs-5"></i><span>Profile</span></a>
+							<li><a class="dropdown-item d-flex align-items-center" href="{{route('web.user.profile', $user->id)}}"><i class="bx bx-user fs-5"></i><span>Profile</span></a>
 							</li>
-							<li><a class="dropdown-item d-flex align-items-center" href="javascript:;"><i class="bx bx-cog fs-5"></i><span>Settings</span></a>
+							<!-- <li><a class="dropdown-item d-flex align-items-center" href="javascript:;"><i class="bx bx-cog fs-5"></i><span>Settings</span></a> -->
 							</li>
 							<li>
 								<div class="dropdown-divider mb-0"></div>
@@ -400,18 +401,18 @@
   <!--start switcher-->
 
 	<!-- Bootstrap JS -->
-	<script src="assets/js/bootstrap.bundle.min.js"></script>
+	<script src="{{asset('assets/js/bootstrap.bundle.min.js')}}"></script>
 	<!--plugins-->
-	<script src="assets/js/jquery.min.js"></script>
-	<script src="assets/plugins/simplebar/js/simplebar.min.js"></script>
-	<script src="assets/plugins/metismenu/js/metisMenu.min.js"></script>
-	<script src="assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js"></script>
-	<script src="assets/plugins/apexcharts-bundle/js/apexcharts.min.js"></script>
+	<script src="{{asset('assets/js/jquery.min.js')}}"></script>
+	<script src="{{asset('assets/plugins/simplebar/js/simplebar.min.js')}}"></script>
+	<script src="{{asset('assets/plugins/metismenu/js/metisMenu.min.js')}}"></script>
+	<script src="{{asset('assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js')}}"></script>
+	<script src="{{asset('assets/plugins/apexcharts-bundle/js/apexcharts.min.js')}}"></script>
 	<!--app JS-->
-	<script src="assets/js/app.js"></script>
+	<script src="{{asset('assets/js/app.js')}}"></script>
 
-	<script src="assets/js/index.js"></script>
-	<script src="assets/plugins/peity/jquery.peity.min.js"></script>
+	<script src="{{asset('assets/js/index.js')}}"></script>
+	<script src="{{asset('assets/plugins/peity/jquery.peity.min.js')}}"></script>
     <script>
        $(".data-attributes span").peity("donut")
     </script>

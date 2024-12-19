@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'online' => \App\Http\Middleware\UpdateUserOnline::class,
+            'web_dashboard' => \App\Http\Middleware\WebDashboard::class,
         ]);
         
     })
