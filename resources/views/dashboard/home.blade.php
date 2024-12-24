@@ -36,14 +36,14 @@
                         <div class="d-flex align-items-center">
                             <div>
                                 <p class="mb-0">Total Users</p>
-                                <h5 class="mb-0">85,028</h5>
+                                <h5 class="mb-0">{{$total_users}}</h5>
                             </div>
                             <div class="dropdown ms-auto">
                                 <a href="javascript:;" class="dropdown-toggle-nocaret more-options dropdown-toggle"
                                     data-bs-toggle="dropdown">
                                     <i class='bx bx-dots-vertical-rounded'></i>
                                 </a>
-                                <ul class="dropdown-menu">
+                                <!-- <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" href="javascript:;">Action</a>
                                     </li>
                                     <li><a class="dropdown-item" href="javascript:;">Another action</a>
@@ -53,10 +53,10 @@
                                     </li>
                                     <li><a class="dropdown-item" href="javascript:;">Something else here</a>
                                     </li>
-                                </ul>
+                                </ul> -->
                             </div>
                         </div>
-                        <div class="" id="chart2"></div>
+                        <!-- <div class="" id="chart2"></div> -->
                     </div>
                 </div>
             </div>
@@ -65,15 +65,15 @@
                     <div class="card-body">
                         <div class="d-flex align-items-center">
                             <div>
-                                <p class="mb-0">Page Views</p>
-                                <h5 class="mb-0">42,892</h5>
+                                <p class="mb-0">Total ONG</p>
+                                <h5 class="mb-0">{{$total_ongs}}</h5>
                             </div>
                             <div class="dropdown ms-auto">
                                 <a href="javascript:;" class="dropdown-toggle-nocaret more-options dropdown-toggle"
                                     data-bs-toggle="dropdown">
                                     <i class='bx bx-dots-vertical-rounded'></i>
                                 </a>
-                                <ul class="dropdown-menu">
+                                <!-- <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" href="javascript:;">Action</a>
                                     </li>
                                     <li><a class="dropdown-item" href="javascript:;">Another action</a>
@@ -83,10 +83,10 @@
                                     </li>
                                     <li><a class="dropdown-item" href="javascript:;">Something else here</a>
                                     </li>
-                                </ul>
+                                </ul> -->
                             </div>
                         </div>
-                        <div class="" id="chart3"></div>
+                        <!-- <div class="" id="chart3"></div> -->
                     </div>
                 </div>
             </div>
@@ -95,15 +95,15 @@
                     <div class="card-body">
                         <div class="d-flex align-items-center">
                             <div>
-                                <p class="mb-0">Avg. Session Duration</p>
-                                <h5 class="mb-0">00:03:20</h5>
+                                <p class="mb-0">Total Alertes</p>
+                                <h5 class="mb-0">{{$total_alerts}}</h5>
                             </div>
                             <div class="dropdown ms-auto">
                                 <a href="javascript:;" class="dropdown-toggle-nocaret more-options dropdown-toggle"
                                     data-bs-toggle="dropdown">
                                     <i class='bx bx-dots-vertical-rounded'></i>
                                 </a>
-                                <ul class="dropdown-menu">
+                                <!-- <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" href="javascript:;">Action</a>
                                     </li>
                                     <li><a class="dropdown-item" href="javascript:;">Another action</a>
@@ -113,10 +113,10 @@
                                     </li>
                                     <li><a class="dropdown-item" href="javascript:;">Something else here</a>
                                     </li>
-                                </ul>
+                                </ul> -->
                             </div>
                         </div>
-                        <div class="" id="chart4"></div>
+                        <!-- <div class="" id="chart4"></div> -->
                     </div>
                 </div>
             </div>
@@ -125,15 +125,15 @@
                     <div class="card-body">
                         <div class="d-flex align-items-center">
                             <div>
-                                <p class="mb-0">Bounce Rate</p>
-                                <h5 class="mb-0">51.46%</h5>
+                                <p class="mb-0">Total Evennement</p>
+                                <h5 class="mb-0">{{$total_evennements}}</h5>
                             </div>
                             <div class="dropdown ms-auto">
                                 <a href="javascript:;" class="dropdown-toggle-nocaret more-options dropdown-toggle"
                                     data-bs-toggle="dropdown">
                                     <i class='bx bx-dots-vertical-rounded'></i>
                                 </a>
-                                <ul class="dropdown-menu">
+                                <!-- <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" href="javascript:;">Action</a>
                                     </li>
                                     <li><a class="dropdown-item" href="javascript:;">Another action</a>
@@ -143,10 +143,10 @@
                                     </li>
                                     <li><a class="dropdown-item" href="javascript:;">Something else here</a>
                                     </li>
-                                </ul>
+                                </ul> -->
                             </div>
                         </div>
-                        <div class="" id="chart5"></div>
+                        <!-- <div class="" id="chart5"></div> -->
                     </div>
                 </div>
             </div>

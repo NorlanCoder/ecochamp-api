@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Web;
 
+use App\Enums\PostType;
 use App\Http\Controllers\Controller;
+use App\Models\Post;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -69,7 +71,18 @@ class AuthController extends Controller
 
     public function dashboard(){
         $user = Auth::user();
-        return view('dashboard.home', compact(['user']));
+        $total_users = User::where('account_type', 'individual')
+            ->where('role', 'ativist')->count();
+        $total_ongs = User::where('account_type', 'ong')
+            ->where('role', 'ativist')->count();
+        
+        $total_alerts = Post::where('type', PostType::Alerte)
+                    ->count();
+        
+        $total_evennements = Post::where('type', PostType::Evennement)
+                ->count();
+
+        return view('dashboard.home', compact(['user', 'total_users', 'total_ongs', 'total_alerts', 'total_evennements']));
     }
 
 
